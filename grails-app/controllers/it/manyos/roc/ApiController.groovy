@@ -8,6 +8,9 @@ import groovy.json.JsonSlurper
 import java.text.SimpleDateFormat
 
 class ApiController {
+
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE", getNewFieldID: "GET", licenseCount:"GET", environments:"GET", activeQuery:"GET"]
+
     def remedyService
 
     def getNewFieldID() {
@@ -141,6 +144,8 @@ class ApiController {
         def showServerConfig = false
         def showServerStatistics = false
         def showDisplayOnlyFields = false
+        def cacheResults = false
+        def cacheTime = 600000
         ARServerUser context = new ARServerUser();
         try {
             //check for environment
@@ -169,6 +174,10 @@ class ApiController {
                 showServerStatistics = true
             if (params.showDisplayOnlyFields && params.showDisplayOnlyFields.equalsIgnoreCase("true"))
                 showDisplayOnlyFields=true
+            if (params.cacheResults && params.cacheResults.equalsIgnoreCase("true"))
+                cacheResults=true
+            if (params.cacheTime)
+                cacheTime=params.cacheTime
 
             //Return Formlist if no query given
             if (params.form == null || params.form == '') {
@@ -210,7 +219,7 @@ class ApiController {
                         translateSelectionFields,
                         params.firstEntry?.toInteger() ?:0,
                         params.maxEntries?.toInteger() ?:0,
-                        showDisplayOnlyFields)
+                        showDisplayOnlyFields, cacheResults, cacheTime)
 
                 returnValue['status'] = 'success'
                 returnValue['query'] = params.query
@@ -244,6 +253,145 @@ class ApiController {
             else
                 render returnValue as JSON
 
+        } finally {
+            context.logout()
+        }
+    }
+
+
+    //Put = Update
+    def update() {
+        log.debug("Params: " + params)
+        def format = "JSON"
+        ARServerUser context = new ARServerUser();
+        try {
+            //check for environment
+            if (params.environment == null || params.environment == '')
+                throw new Exception("Environment not provided")
+            def environment = RemedyEnvironment.get(params.environment)
+            if (!environment)
+                throw new Exception("Environment not found")
+            def server = environment.server[0]
+            log.debug("Server: " + server)
+            context = remedyService.getARContext(server)
+            //context = ApiService.getARContext(params.server, params.port?.toInteger() ?:0)
+            def returnValue
+            //checke form
+            if (params.form == null || params.form.equals(""))
+                render "Please provide a form"
+            if (params.format && params.format.equalsIgnoreCase("XML")) {
+                format = "XML"
+                //create Entries
+                /*request.XML.entry.entry.Strasse__c.each {
+                    log.debug it
+                }*/
+                returnValue = remedyService.updateEntries(context, params.form, request.XML)
+                render returnValue as XML
+            } else {
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON)
+                render returnValue as JSON
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage())
+            if (e.getCause() == null)
+                render e.getClass().getSimpleName().toString() + ": " + e.toString()
+            else
+                render e.getClass().getSimpleName().toString() + ": " + (e.getCause().toString());
+        } finally {
+            context.logout()
+        }
+    }
+
+    def delete() {
+        //TODO Kann kein Chunk Delete (falls return list eingeschr�nkt ist)
+        log.debug("Params: " + params)
+        def format = "JSON"
+        def returnFieldNames = true
+        def translateSelectionFields = true
+        ARServerUser context = new ARServerUser();
+        try {
+            //check for environment
+            if (params.environment == null || params.environment == '')
+                throw new Exception("Environment not provided")
+            def environment = RemedyEnvironment.get(params.environment)
+            if (!environment)
+                throw new Exception("Environment not found")
+            def server = environment.server[0]
+            log.debug("Server: " + server)
+            context = remedyService.getARContext(server)
+            //context = ApiService.getARContext(params.server, params.port?.toInteger() ?:0)
+            def records
+            //Return Error if no query given
+            if (params.form == null || params.form == '') {
+                render "Error: Please provide a form!"
+            }
+            //Check format
+            if (params.format && params.format.equalsIgnoreCase("XML"))
+                format = "XML"
+            //Return Error if no query given
+            if (params.query == null || params.query == '') {
+                def fields = remedyService.getFields(context, params.form)
+                render "Error: Please provide a query!"
+            } else {
+                //Return records
+                records = remedyService.deleteEntries(context,
+                        params.form,
+                        params.query,
+                        params.firstEntry?.toInteger() ?:0,
+                        params.maxEntries?.toInteger() ?:0)
+                if (format == "XML")
+                    render records as XML
+                else
+                    render records as JSON
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage())
+            if (e.getCause() == null)
+                render e.getClass().getSimpleName().toString() + ": " + e.toString()
+            else
+                render e.getClass().getSimpleName().toString() + ": " + (e.getCause().toString());
+        } finally {
+            context.logout()
+        }
+
+    }
+
+    //Post = create
+    def save() {
+        log.debug params
+        def format = "JSON"
+        ARServerUser context = new ARServerUser();
+        try {
+            //check for environment
+            if (params.environment == null || params.environment == '')
+                throw new Exception("Environment not provided")
+            def environment = RemedyEnvironment.get(params.environment)
+            if (!environment)
+                throw new Exception("Environment not found")
+            def server = environment.server[0]
+            log.debug("Server: " + server)
+            context = remedyService.getARContext(server)
+            //context = ApiService.getARContext(params.server, params.port?.toInteger()?:0)
+            def returnValue
+            //checke form
+            if (params.form == null || params.form.equals(""))
+                render "Please provide a form"
+            //check format
+            if (params.format && params.format.equalsIgnoreCase("XML")) {
+                format = "XML"
+                returnValue = remedyService.createEntries(context, params.form, request.XML)
+                render returnValue as XML
+            } else {
+                //create Entries
+                returnValue = remedyService.createEntries(context, params.form, request.JSON)
+                render returnValue as JSON
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage())
+            if (e.getCause() == null)
+                render e.getClass().getSimpleName().toString() + ": " + e.toString()
+            else
+                render e.getClass().getSimpleName().toString() + ": " + (e.getCause().toString());
         } finally {
             context.logout()
         }

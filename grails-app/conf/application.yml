@@ -2,7 +2,7 @@
 grails:
     profile: web
     codegen:
-        defaultPackage: roc
+        defaultPackage: it.manyos.roc
     spring:
         transactionManagement:
             proxies: false
@@ -100,11 +100,15 @@ environments:
         dataSource:
             dbCreate: update
             url: jdbc:h2:./devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+        authentication:
+            rsso-enabled: false
     test:
         dataSource:
             dbCreate: update
             url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
     production:
+        authentication:
+            rsso-enabled: true
         dataSource:
             dbCreate: update
             url: jdbc:h2:./prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE

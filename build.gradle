@@ -10,8 +10,8 @@ buildscript {
     }
 }
 
-version "0.2"
-group "roc"
+version "0.3"
+group "it.manyos.roc"
 
 apply plugin:"eclipse"
 apply plugin:"idea"
@@ -62,7 +62,8 @@ dependencies {
 }
 
 bootRun {
-    jvmArgs('-Dspring.output.ansi.enabled=always')
+    jvmArgs = ['-Dspring.output.ansi.enabled=always','-Dlocal.config.location=app-config.yml']
+    //jvmArgs('-Dlocal.config.location=app-config.yml')
 }
 
 

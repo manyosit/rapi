@@ -12,17 +12,24 @@ class ServerController {
     static scaffold = Server
 
     def run = {
-        //RemedyService.processMetrics()
-        def rsso = new RSSOClient()
-        def token = rsso.getToken(request)
-        log.error "Token: " + token.toString()
-        def principal = token.getPrincipal()
-        log.error "Principal: " + principal
-        def name = principal.getName()
-        log.error "Name: " + name
 
-        render "Hello " + name
 
+        def activate = grailsApplication.config.getProperty('authentication.rsso-enabled')
+
+        log.debug("RSSO activate status = " +activate)
+
+        if (activate) {
+            //RemedyService.processMetrics()
+            def rsso = new RSSOClient()
+            def token = rsso.getToken(request)
+            log.error "Token: " + token.toString()
+            def principal = token.getPrincipal()
+            log.error "Principal: " + principal
+            def name = principal.getName()
+            log.error "Name: " + name
+
+            render "Hello " + name
+        } else render "RSSO is not enabled"
     }
 
     def test = {

@@ -29,7 +29,8 @@ class UtilService {
 			return password
 		}
 	}
-	
+
+    //TODO Fieldcache Auf ArrayList umbauen
 	def int getFieldId(fieldCache, fieldName) {
 		int myId = -1
 		fieldCache.keySet().each {
@@ -89,13 +90,13 @@ class UtilService {
 	
 	def setEntry(myEntry, JSONEntry, fieldCache) {
 		JSONEntry.keySet().each { sourceField ->
-			
 			def fieldId = -1
 			try {
 				fieldId = Integer.parseInt(sourceField)
 			} catch (Exception e1) {
 				fieldId = getFieldId(fieldCache, sourceField)
 			}
+			log.error(fieldId)
 			if (fieldId == -1)
 				throw new Exception("Field: "+ sourceField + " not found on form ")
 			

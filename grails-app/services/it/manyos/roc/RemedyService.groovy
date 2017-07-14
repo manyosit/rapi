@@ -9,6 +9,7 @@ import org.hibernate.SessionFactory;
 @Transactional
 class RemedyService {
     def cache = new HashMap()
+    def resultCache = new HashMap()
     def cacheTime = 10 * 60 * 1000 //10 minutes
 
     def sessionFactory
@@ -59,7 +60,7 @@ class RemedyService {
                                 server: myServer,
                                 runTime: duration)
                             .save(failOnError:true, flush:true)
-                    println newResult
+                    println "New Result: " + newResult + " id: " + newResult.id
                 }
             }
             //session.flush()
@@ -238,15 +239,39 @@ class RemedyService {
      * @param maxRows The number of rows to return. 0 = all entries
      * @return returns all records as HashMap
      */
-    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields) {
+    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime) {
+        log.debug "Cache results " + cacheResults
+
+        def serverCache = resultCache.get(context.getServer())
+        def userCache = null
+        def schemaCache = null;
+        if (serverCache != null) {
+            log.debug "Server Cache found"
+            userCache = serverCache.get(context.getUser())
+            if (userCache != null) {
+                log.debug "User Cache found"
+                schemaCache = userCache.get(schema)
+                if (schemaCache != null) {
+                    log.debug "Schema Cache found"
+                    def cachedRecords = schemaCache.get(query)
+                    if (cachedRecords != null && ((new Date().getTime() - cachedRecords.cacheDate.getTime()) < cacheTime)) {
+                        log.debug "load records from cache"
+                        log.debug "cache valid since " + (new Date().getTime() - cachedRecords.cacheDate.getTime()) + " msecs. Max cache time " + cacheTime + " msecs"
+                        return cachedRecords.records
+                    }
+                }
+            }
+        }
 
         def formFields = getFields(context, schema)
         def dataFields = ["CharacterField", "CurrencyField", "DateOnlyField", "DateTimeField", "DecimalField", "DiaryField", "IntegerField", "RealField", "SelectionField", "TimeOnlyField"]
-        log.debug "Query " + schema + " with " + query
+        log.debug "Query form " + schema + " with " + query
         if (query == null || query == '')
             query = "'1' != \$NULL\$"
         def allRecords = []
         QualifierInfo qual = context.parseQualification(schema, query);
+
+        //log.debug "Qualifier: " + qual.toString();
 
         def fieldIds = new ArrayList()
         formFields.each { field ->
@@ -332,6 +357,20 @@ class RemedyService {
             allRecords.add(recordData)
         }
         log.debug "Query returned " + allRecords.size() + " records "
+        if (cacheResults) {
+            def myCache = new RecordCache(schema:schema, cacheDate:new Date(), records:allRecords)
+            //Initialize Objects if not found
+            if (serverCache == null)
+                serverCache = new HashMap()
+            if (userCache == null)
+                userCache = new HashMap()
+            if (schemaCache == null)
+                schemaCache = new HashMap()
+            schemaCache[query] = myCache
+            userCache[schema] = schemaCache
+            serverCache[context.getUser()] = userCache
+            resultCache[context.getServer()] = serverCache
+        }
         return allRecords
     }
 
@@ -357,11 +396,13 @@ class RemedyService {
                 context.deleteEntry(schema, eListInfo.getEntryID(), 0)
                 allEntries.put(eListInfo.getEntryID(), "success")
             } catch (Exception e) {
+                log.error("handle exception" + e.getCause().toString())
                 e.printStackTrace()
                 log.error e.getMessage()
-                allEntries.put(eListInfo.getEntryID(), e.getCause().toString())
+                allEntries.put(eListInfo.getEntryID(), e.getMessage().toString())
             }
         }
+
         return allEntries
     }
 
@@ -419,15 +460,34 @@ class RemedyService {
      * @param entryObjects The JSON Objects to update
      * @return returns a TreeMap with all entry ids and any errors
      */
-    def updateEntries(ARServerUser context, String schema, entryObjects) {
+    def updateEntries(ARServerUser context, String schema, entryObject) {
+        log.error("Entries: " + entryObject.size())
+        def recordId = entryObject['id']
+        def values = entryObject['values']
         //loadfieldlist
+        def myEntry = null
+        log.error("Entries: " + recordId + ": " + values)
         def fieldCache = getFields(context, schema)
-        def allEntries = new TreeMap();
-        entryObjects.keySet().each {
+        try {
+            int[] fields = [1,2]
+            myEntry = context.getEntry(schema, recordId, fields)
+            log.error("Entries: " +myEntry)
+            myEntry = UtilService.setEntry(myEntry, values, fieldCache)
+            //Save entry
+            context.setEntry(schema, recordId, myEntry, new Timestamp(), 0)
+            //allEntries.put(it, "success")
+            log.error("Entries: " +myEntry)
+        } catch (Exception updateException) {
+            //updateException.printStackTrace()
+            log.error "API Service: " + updateException
+            //allEntries.put(it, updateException.toString())
+        }
+        /*def allEntries = new TreeMap();
+        entryObject.keySet().each {
             try {
                 int[] fields = [1,2]
                 def myEntry = context.getEntry(schema, it, fields)
-                myEntry = UtilService.setEntry(myEntry, entryObjects.get(it), fieldCache)
+                myEntry = UtilService.setEntry(myEntry, entryObject.get(it), fieldCache)
                 //Save entry
                 context.setEntry(schema, it, myEntry, new Timestamp(), 0)
                 allEntries.put(it, "success")
@@ -436,8 +496,9 @@ class RemedyService {
                 log.error "API Service: " + updateException
                 allEntries.put(it, updateException.toString())
             }
-        }
-        return allEntries
+        }*/
+        //return myEntry
+        return null
     }
 
     /**

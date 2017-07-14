@@ -33,10 +33,9 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
     }
     logger("StackTrace", ERROR, ['FULL_STACKTRACE'], false)
     root(ERROR, ['STDOUT', 'FULL_STACKTRACE'])
-    logger("com.bmc.rsso", DEBUG, ['STDOUT'])
-    logger("it.manyos.roc", DEBUG, ['STDOUT'])
 }
 else {
     root(ERROR, ['STDOUT'])
+    logger("grails.app", DEBUG, ['STDOUT'])
     logger("com.bmc.rsso", DEBUG, ['STDOUT'])
 }
