@@ -10,4 +10,7 @@ RUN grails dependency-report
 
 # Set Default Behavior
 ENTRYPOINT ["grails"]
+
+EXPOSE 8080
+
 CMD ["run"]
