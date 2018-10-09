@@ -154,7 +154,7 @@ class RemedyService {
         log.debug "Query returned " + eListInfos.size() + " records of total " + arSize
         returnValue["form"] = schema
         returnValue["query"] = query
-        returnValue["resultSize"] = arSize.intValue()
+        returnValue["dataSize"] = arSize.intValue()
         returnValue["runTime"] = duration
         return returnValue
     }
