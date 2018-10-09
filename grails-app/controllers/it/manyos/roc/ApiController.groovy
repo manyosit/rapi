@@ -146,6 +146,7 @@ class ApiController {
         def showDisplayOnlyFields = false
         def cacheResults = false
         def cacheTime = 600000
+        ArrayList fields = null;
         ARServerUser context = new ARServerUser();
         try {
             //check for environment
@@ -178,6 +179,8 @@ class ApiController {
                 cacheResults=true
             if (params.cacheTime)
                 cacheTime=params.cacheTime
+            if (params.fields)
+                fields=params.fields.tokenize( ',' );
 
             //Return Formlist if no query given
             if (params.form == null || params.form == '') {
@@ -219,7 +222,7 @@ class ApiController {
                         translateSelectionFields,
                         params.firstEntry?.toInteger() ?:0,
                         params.maxEntries?.toInteger() ?:0,
-                        showDisplayOnlyFields, cacheResults, cacheTime)
+                        showDisplayOnlyFields, cacheResults, cacheTime, fields)
 
                 returnValue['status'] = 'success'
                 returnValue['query'] = params.query

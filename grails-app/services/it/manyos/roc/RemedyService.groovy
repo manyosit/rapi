@@ -141,6 +141,7 @@ class RemedyService {
      * @return returns the record size
      */
     def countRecords(ARServerUser context, String schema, String query) {
+        def startDateEach = new Date()
         def returnValue = new TreeMap();
         def formFields = getFields(context, schema)
         log.debug "Query " + schema + " with " + query
@@ -149,10 +150,12 @@ class RemedyService {
         QualifierInfo qual = context.parseQualification(schema, query);
         OutputInteger arSize = new OutputInteger();
         List<EntryListInfo> eListInfos = context.getListEntry(schema, qual, 0, 0, null, null, false, arSize);
+        def duration = new Date().getTime() - startDateEach.getTime()
         log.debug "Query returned " + eListInfos.size() + " records of total " + arSize
         returnValue["form"] = schema
         returnValue["query"] = query
         returnValue["resultSize"] = arSize.intValue()
+        returnValue["runTime"] = duration
         return returnValue
     }
 
@@ -230,7 +233,6 @@ class RemedyService {
         return allFields
     }
 
-
     /**
      * @param context The AR System Context to work with
      * @param schema The schema to query
@@ -240,6 +242,19 @@ class RemedyService {
      * @return returns all records as HashMap
      */
     def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime) {
+        return queryForm(context, schema, query, returnFieldNames, translateSelectionFields, firstEntry, maxEntries, showDisplayOnlyFields, cacheResults, cacheTime, null);
+    }
+
+
+    /**
+     * @param context The AR System Context to work with
+     * @param schema The schema to query
+     * @param query The query itself. If empty it will be set to '1'!=$NULL$
+     * @param fisrtRow The first record to return. Counting starts with 0
+     * @param maxRows The number of rows to return. 0 = all entries
+     * @return returns all records as HashMap
+     */
+    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime, ArrayList fields) {
         log.debug "Cache results " + cacheResults
 
         def serverCache = resultCache.get(context.getServer())
@@ -273,15 +288,23 @@ class RemedyService {
 
         //log.debug "Qualifier: " + qual.toString();
 
-        def fieldIds = new ArrayList()
-        formFields.each { field ->
-            if (dataFields.contains(field.type)) {
-                if (field.entryMode != "Display-only" && field.fieldId != 15)
-                    fieldIds.add(field.fieldId)
-                else if (field.entryMode == "Display-only" && showDisplayOnlyFields == true)
-                    fieldIds.add(field.fieldId)
+        def fieldIds = new ArrayList();
+
+
+        if (fields != null)
+            fieldIds = fields
+
+        else {
+            formFields.each { field ->
+                if (dataFields.contains(field.type)) {
+                    if (field.entryMode != "Display-only" && field.fieldId != 15)
+                        fieldIds.add(field.fieldId)
+                    else if (field.entryMode == "Display-only" && showDisplayOnlyFields == true)
+                        fieldIds.add(field.fieldId)
+                }
             }
         }
+
 
         //List<EntryListInfo> eListInfos = context.getListEntry(schema, qual, firstEntry, maxEntries, null, null, false, null);
         def records = context.getListEntryObjects(schema, qual, firstEntry, maxEntries, null, fieldIds as int[] , false, null)
