@@ -58,7 +58,7 @@ class RemedyService {
                                 status: status,
                                 value: jsonValue,
                                 server: myServer,
-                                runTime: duration)
+                                runtime: duration)
                             .save(failOnError:true, flush:true)
                     println "New Result: " + newResult + " id: " + newResult.id
                 }
@@ -155,7 +155,7 @@ class RemedyService {
         returnValue["form"] = schema
         returnValue["query"] = query
         returnValue["dataSize"] = arSize.intValue()
-        returnValue["runTime"] = duration
+        returnValue["runtime"] = duration
         return returnValue
     }
 
@@ -491,18 +491,22 @@ class RemedyService {
         def myEntry = null
         log.error("Entries: " + recordId + ": " + values)
         def fieldCache = getFields(context, schema)
+        def returnValue = [:]
         try {
             int[] fields = [1,2]
             myEntry = context.getEntry(schema, recordId, fields)
-            log.error("Entries: " +myEntry)
+            log.error("Entries: " + myEntry)
             myEntry = UtilService.setEntry(myEntry, values, fieldCache)
             //Save entry
+            log.error("Entries set: " + myEntry)
             context.setEntry(schema, recordId, myEntry, new Timestamp(), 0)
-            //allEntries.put(it, "success")
-            log.error("Entries: " +myEntry)
+            returnValue['message'] = 'success'
+            log.error("Entries: " + myEntry)
         } catch (Exception updateException) {
             //updateException.printStackTrace()
             log.error "API Service: " + updateException
+            returnValue['message'] = updateException.toString()
+
             //allEntries.put(it, updateException.toString())
         }
         /*def allEntries = new TreeMap();
@@ -521,7 +525,7 @@ class RemedyService {
             }
         }*/
         //return myEntry
-        return null
+        return returnValue
     }
 
     /**

@@ -19,4 +19,9 @@ class FieldDetails {
 	def getValueMapping() {
 		return valueMapping
 	}
+
+	@Override
+	String toString() {
+		return '' + name + ' (' + fieldId+')'
+	}
 }

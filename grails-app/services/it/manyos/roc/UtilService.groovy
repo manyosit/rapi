@@ -30,13 +30,11 @@ class UtilService {
 		}
 	}
 
-    //TODO Fieldcache Auf ArrayList umbauen
 	def int getFieldId(fieldCache, fieldName) {
 		int myId = -1
-		fieldCache.keySet().each {
-			def myField = fieldCache.get(it)
-			if (myField.getName().equalsIgnoreCase(fieldName)) {
-				myId =  it.intValue()
+		fieldCache.each { field ->
+			if (field.name.equalsIgnoreCase(fieldName)) {
+				myId = field.fieldId
 			}
 		}
 		return myId
@@ -64,24 +62,23 @@ class UtilService {
 	}
 	
 	/**
-	 * @param fieldCache The cache object with the field definition
-	 * @param field The name or id of the field
-	 * @return the type of the field
+	 * @param fieldCache The cache object with the fieldName definition
+	 * @param fieldName The name or id of the fieldName
+	 * @return the type of the fieldName
 	 */
-	def String getFieldType(fieldCache, field) {
-		//log.debug field
+	def String getFieldType(fieldCache, fieldName) {
+		//log.debug fieldName
 		
 		String fieldType = null
 		try {
-			def fieldId = Integer.parseInt(field)
+			def fieldId = Integer.parseInt(fieldName)
 			def myField = fieldCache.get(fieldId)
 			//log.debug myField
 			fieldType = myField.type
 		} catch (Exception e) {
-			fieldCache.keySet().each {
-				def myField = fieldCache.get(it)
-				if (myField.getName().equalsIgnoreCase(field)) {
-					fieldType =  myField.type
+			fieldCache.each { field ->
+				if (field.name.equalsIgnoreCase(fieldName)) {
+					fieldType = field.type
 				}
 			}
 		}
@@ -96,14 +93,13 @@ class UtilService {
 			} catch (Exception e1) {
 				fieldId = getFieldId(fieldCache, sourceField)
 			}
-			log.error(fieldId)
 			if (fieldId == -1)
 				throw new Exception("Field: "+ sourceField + " not found on form ")
 			
 			def fieldType = getFieldType(fieldCache, sourceField)
 			
 			def value = getFieldValue(fieldType, JSONEntry.get(sourceField))
-				
+
 			myEntry.put(fieldId, value)
 		}
 		return myEntry
