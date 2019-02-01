@@ -1,11 +1,9 @@
 package it.manyos.roc
 
-import grails.transaction.Transactional
 import com.bmc.arsys.api.*
 import it.manyos.roc.FieldDetails
 import groovy.json.*
 
-@Transactional
 class RemedyService {
     def cache = new HashMap()
     def resultCache = new HashMap()
