@@ -1,0 +1,83 @@
+Data can be create via a POST Request
+
+Use the URL as follows
+
+http://<tomcat>/arapi/<arserver>/<schema>
+
+http://localhost:8080/arapi/arserver123.mydomain.de/HPD:Help%20Desk/
+
+The data itself needs to be provided as JSON in the following format
+
+{code}
+{
+	"<myReference>": {
+		"<fieldid>": "<value>",
+		"<fieldname>": "<value>"
+	}
+}
+{code}
+
+The response will return a JSON with the original reference and the created ar system request id
+
+{code}
+{
+	"<myReference>": "<arentryid>"
+}
+{code}
+
+e.g.
+
+Sample Request
+
+{code}
+{
+    "myID_00000000102": {
+		"Short Description": "New Update Record",
+		"Character Field": "rohase",
+		"Decimal Field": 1.97,
+		"Real Field": 63332.556,
+		"Time Field": "19:00:00",
+		"Integer Field": 9,
+		"Diary Field": "New Entry",
+		7: "Resolved",
+		"Date Field": "01.06.2014",
+		"Submitter": "roha",
+		"Date/time Fiel": "Sun Jun 02 01:56:02 CEST 2014",
+		"Currency Field": {
+			"conversionDate": "Tue Apr 01 11:10:35 CEST 2014",
+			"currencyCode": "USD",
+			"value": 5299.82
+		}
+    },
+    "myRequestNumber14": {
+		"Status": 0,
+		"8": "Shorty"
+	}
+}
+{code}
+
+Sample Response
+
+{code}
+{
+	"myID_00000000102": "000000000000028",
+	"myRequestNumber14": "000000000000031"
+}
+{code}
+
+h3. Attachments
+
+Attachments can be set or update via a multipart/form-data POST request to a specific URL.
+
+URL Format:
+
+{code}http://<tomcat>/arapi/<arserver>/<schema>/setAttachment/<entryID>/<attachmentFieldID>{code}
+
+* _<entryID>_ : The ID of entry / record where the attachment needs to be set / updated
+* _<attachmentFieldID>_ : The Field ID of attachment field that needs to be set / updated 
+
+The filename needs to be provided as value for the _name_ attribute.
+
+Sample URL:
+
+{code}http://localhost:8080/arapi/muc-vip-srvw084.intern.manyos.de/ARAPI:test/setAttachment/000000000000101/536870915{code}

@@ -1,0 +1,5 @@
+h4. Deployment
+
+Rename the arapi-x.war file to arapi.war and copy it to the webapps folder of your tomcat and restart it. e.g. your midtier tomcat
+High Availability
+If you have a HA environment, deploy the .war file to all your tomcats.

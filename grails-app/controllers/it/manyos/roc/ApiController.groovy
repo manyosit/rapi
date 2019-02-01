@@ -4,6 +4,7 @@ import com.bmc.arsys.api.ARServerUser
 import grails.converters.JSON
 import grails.converters.XML
 import groovy.json.JsonSlurper
+import org.springframework.web.multipart.MultipartHttpServletRequest
 
 import java.text.SimpleDateFormat
 
@@ -13,7 +14,7 @@ class ApiController {
 
     def remedyService
 
-    def getNewFieldID() {
+    /*def getNewFieldID() {
         def returnValue = [:]
         def fieldID = 0
         def message = 'success'
@@ -28,37 +29,12 @@ class ApiController {
         }
         returnValue['message'] = message
         render returnValue as JSON
-    }
+    }*/
 
     def index() {
-        TreeMap totals = [:]
-        def myMetric = Metric.get(2)
-        def results = myMetric.results
-        def jsonSlurper = new JsonSlurper()
-        results.each {
-
-            def myObject = jsonSlurper.parseText(it.value)
-            def date = it.executionDate.format("yyyy-MM-dd HH:mm")
-            def myTotals = totals[date]
-            //totals[date]
-            def arServer = myObject."AR Server"
-            if (arServer) {
-                //println '' + date + ' : ' + arServer
-                def fixed = arServer.fixed?:0
-                def floating = arServer.floating?:0
-                def count = fixed + floating
-                println()
-                totals[date] = totals[date]?:0 + count
-            }
-        }
-        println('totals: ' + totals);
-        def returns = [:]
-        returns['keys'] = totals.keySet()
-        returns['values'] = totals.values()
-        render returns as JSON
     }
 
-    def licenseCount() {
+    /*def licenseCount() {
         TreeMap totals = [:]
         def max=params.max?:100
         def myMetric = Metric.get(2)
@@ -66,6 +42,7 @@ class ApiController {
         /*def results = MetricResult.findAllByMetric(myMetric,
                 [max: max, sort: "executionDate", order: "desc", offset: 0])
         println(results.size())*/
+    /*
         def jsonSlurper = new JsonSlurper()
         results.each {
 
@@ -115,9 +92,9 @@ class ApiController {
         }
         def renderValue = ['results':allValues]
         render renderValue as JSON
-    }
+    }*/
 
-    def environments = {
+    /*def environments = {
         def environmentList = []
         def environments = RemedyEnvironment.findAll()
         environments.each {
@@ -130,9 +107,9 @@ class ApiController {
         //println environments
         def returnValue = ['environments':environmentList]
         render returnValue as JSON
-    }
+    }*/
 
-    def activeQuery = {
+    def get() {
         def returnValue = [:]
         returnValue['status'] = 'success'
         def startDate = new Date()
@@ -224,7 +201,7 @@ class ApiController {
 
                 returnValue['status'] = 'success'
                 returnValue['query'] = params.query
-                returnValue['server'] = server.name + ":" + server.port
+                returnValue['server'] = params.server + ":" + params.port?.toInteger() ?: 0
                 returnValue['form'] = params.form
                 returnValue['runtime'] = new Date().getTime() - startDate.getTime()
                 returnValue['dataSize'] = records.size()
@@ -261,21 +238,18 @@ class ApiController {
 
 
     //Put = Update
-    def update() {
+    def put() {
         log.debug("Params: " + params)
         def format = "JSON"
+        def impersonateUser = null
         ARServerUser context = new ARServerUser();
         try {
-            //check for environment
-            if (params.environment == null || params.environment == '')
-                throw new Exception("Environment not provided")
-            def environment = RemedyEnvironment.get(params.environment)
-            if (!environment)
-                throw new Exception("Environment not found")
-            def server = environment.server[0]
-            log.debug("Server: " + server)
-            context = remedyService.getARContext(server)
-            //context = ApiService.getARContext(params.server, params.port?.toInteger() ?:0)
+            if (params.impersonateUser ) {
+                impersonateUser = params.impersonateUser
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0, impersonateUser)
+            } else {
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
+            }
             def returnValue
             //checke form
             if (params.form == null || params.form.equals(""))
@@ -311,18 +285,15 @@ class ApiController {
         def format = "JSON"
         def returnFieldNames = true
         def translateSelectionFields = true
+        def impersonateUser = null
         ARServerUser context = new ARServerUser();
         try {
-            //check for environment
-            if (params.environment == null || params.environment == '')
-                throw new Exception("Environment not provided")
-            def environment = RemedyEnvironment.get(params.environment)
-            if (!environment)
-                throw new Exception("Environment not found")
-            def server = environment.server[0]
-            log.debug("Server: " + server)
-            context = remedyService.getARContext(server)
-            //context = ApiService.getARContext(params.server, params.port?.toInteger() ?:0)
+            if (params.impersonateUser ) {
+                impersonateUser = params.impersonateUser
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0, impersonateUser)
+            } else {
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
+            }
             def records
             //Return Error if no query given
             if (params.form == null || params.form == '') {
@@ -360,21 +331,18 @@ class ApiController {
     }
 
     //Post = create
-    def save() {
-        log.debug params
+    def post() {
+        log.debug ('params', params);
         def format = "JSON"
+        def impersonateUser = null
         ARServerUser context = new ARServerUser();
         try {
-            //check for environment
-            if (params.environment == null || params.environment == '')
-                throw new Exception("Environment not provided")
-            def environment = RemedyEnvironment.get(params.environment)
-            if (!environment)
-                throw new Exception("Environment not found")
-            def server = environment.server[0]
-            log.debug("Server: " + server)
-            context = remedyService.getARContext(server)
-            //context = ApiService.getARContext(params.server, params.port?.toInteger()?:0)
+            if (params.impersonateUser ) {
+                impersonateUser = params.impersonateUser
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0, impersonateUser)
+            } else {
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
+            }
             def returnValue
             //checke form
             if (params.form == null || params.form.equals(""))
@@ -388,6 +356,65 @@ class ApiController {
                 //create Entries
                 returnValue = remedyService.createEntries(context, params.form, request.JSON)
                 render returnValue as JSON
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage())
+            if (e.getCause() == null)
+                render e.getClass().getSimpleName().toString() + ": " + e.toString()
+            else
+                render e.getClass().getSimpleName().toString() + ": " + (e.getCause().toString());
+        } finally {
+            context.logout()
+        }
+    }
+
+    def getAttachment() {
+        log.debug params
+        ARServerUser context = new ARServerUser();
+        try {
+            context = ApiService.getARContext(params.server, params.port?.toInteger() ?:0)
+            int[] fieldIds = [Integer.parseInt(params.fieldId)]
+            def myEntry = context.getEntry(params.form, params.entryId, fieldIds)
+            //log.debug myEntry
+            def attachmentValue = myEntry.get(Integer.parseInt(params.fieldId)).getValue()
+            //log.debug attachmentValue
+            def fileName = attachmentValue.getName()
+            //log.debug fileName
+            response.setContentType("application/octet-stream") // or or image/JPEG or text/xml or whatever type the file is
+            response.setHeader("Content-disposition", "attachment;filename=${fileName}")
+            response.outputStream << context.getEntryBlob(params.form, params.entryId, Integer.parseInt(params.fieldId))
+        } catch (Exception e) {
+            log.error(e.getMessage())
+            if (e.getCause() == null)
+                render e.getClass().getSimpleName().toString() + ": " + e.toString()
+            else
+                render e.getClass().getSimpleName().toString() + ": " + (e.getCause().toString());
+        } finally {
+            context.logout()
+        }
+    }
+
+
+    def setAttachment() {
+        log.debug params
+        log.debug request.toString()
+        ARServerUser context = new ARServerUser();
+        try {
+            context = ApiService.getARContext(params.server, params.port?.toInteger() ?:0)
+
+            if (request instanceof MultipartHttpServletRequest){
+                //log.debug request.getFileNames().toString()
+                //Get the file's name from request
+                def fileName = request.getFileNames()[0]
+                //Get a reference to the uploaded file.
+                def uploadedFile = request.getFile(fileName)
+                //log.debug(fileName)
+                //log.debug uploadedFile.getBytes()
+                render ApiService.setAttachment(context, params.form, params.entryId, Integer.parseInt(params.fieldId), fileName, uploadedFile)
+            } else {
+                def returnValue = new HashMap()
+                returnValue[params.entryId] = "error: No file provied"
+                render returnValue
             }
         } catch (Exception e) {
             log.error(e.getMessage())

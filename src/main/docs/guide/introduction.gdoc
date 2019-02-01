@@ -1,0 +1,12 @@
+This application will help you to create, update and query ARSystem or ITSM data in a easy way. No configuration of the application is needed. All necessary values are passed during runtime. It therefore is not optimized for performance but flexibility and simplicity instead.
+It is now feasible to even use Script Languages like Python, PHP, Groovy, Ruby, .... to easily access Remedy Data. This massively decreases development and maintenance costs for integrated BSM Solutions. 
+
+Sample Use Cases:
+
+* Monitoring & Event Management
+* Software Deployment
+* Technical Configuration Management
+* Identity Management
+* Technical Automation
+
+Important note: Our community edition is free for use but comes with absolutely no warranty and support. Please contact service@vipcon.com for a version with support and maintenance.

@@ -1,0 +1,39 @@
+The DELETE operation deletes records based on a provided query.
+
+
+Please keep in mind: The DELETE operation is not used much in Remedy / ITSM. Instead records are often only flagged as deleted (most often for audit / compliance). Also the delete operation might only work if your user has _Administrator_ privileges. 
+
+Request Format:
+
+{code}http://<tomcat>/arapi/<arserver>/<schema>/<query>{code} 
+
+e.g.
+
+{code}http://tomcat/arapi/arserver/ARAPI:test/'1' > "00000000000060%"{code}
+
+Sample Response
+
+{code}
+{
+    "000000000000601": "success",
+    "000000000000602": "success",
+    "000000000000603": "success"
+}
+{code}
+
+h4. Optional Chunking
+
+Chunking allows you to delete a large amount of records in small chunks. e.g. you want to delete all records in chunks with 1000 records each. The first query will set the parameter firstEntry to 0 and the parameter maxEntries to 1000. This will delete records 1 - 1000. The second query will set the parameter firstEntry to 1000 and the parameter maxEntries to 1000. This will delete the records 1001 - 2000.
+
+Two optional parameters are available:
+
+firstEntry: The first entry to delete. Defaults to 0
+maxEntries: The number of entries to delete with this chunk. Defaults to 0 (all)
+
+Samples
+
+{code}http://localhost:8080/arapi/arserver123.mydomain.de/ARAPI:test/'1' LIKE "00000000000060%"?firstEntry=1000&maxEntries=1000{code}
+
+{code}http://localhost:8080/arapi/arserver123.mydomain.de/ARAPI:test/'1' LIKE "00000000000060%"?firstEntry=140{code}
+
+{code}http://localhost:8080/arapi/arserver123.mydomain.de/ARAPI:test/'1' LIKE "00000000000060%"?maxEntries=10{code}

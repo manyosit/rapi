@@ -131,12 +131,12 @@ class RemedyService {
     def getARContext(String server, int port, String user, String password, String impersonateUser) {
         ARServerUser ctx = getARContext(server, port, user, password)
         ctx.impersonateUser(impersonateUser)
-        log.error "impersonated User " + impersonateUser
+        log.debug "impersonated User " + impersonateUser
         return ctx
     }
 
     def getARContext(String server, int port) {
-        ARServerUser ctx = ARServerUser ctx = getARContext(server, port, UtilService.getUsername(), UtilService.getPassword())
+        ARServerUser ctx = getARContext(server, port, UtilService.getUsername(), UtilService.getPassword())
         return ctx
     }
 

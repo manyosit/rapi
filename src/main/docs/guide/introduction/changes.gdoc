@@ -1,0 +1,74 @@
+h3. Version 0.14
+
+* Enhancement: Entry Mode added to field list (e.g. Display-only, Required, Optional, System)
+* Enhancement: Field Limits added to field list (Warning: Can't be determined for some Core System fields like Create Date. null will be returned in this case, also the qualifier for the fieldlimit of table fields was set to null as it can't be converted to json nor to xml)
+* Enhancement: Optional parameter format added. Possible values xml, json. Default value is json
+* Enhancement: Optional parameter countOnly added. Possible values true, false. Default value is false. Returns only the number of records for a certain query.
+* Enhancement: Query of records changed to getListEntryObjects in order to improve performance
+* Enhancement: Parameter showDisplayOnlyFields added to GET records 
+* Enhancement: Status Page added to show license usage
+
+h3. Version 0.13
+
+* Bugfix: Optional Parameter translateSelectionFields=false did not work anymore.
+* Bugfix: Small fix on retrieve form list
+* Enhancement: DELETE operation added for completeness.
+* Enhancement: Field cache is now server and user specific. Important if AR RESTful API is used by different users with different permissions or on different servers with different permissions for the same user.
+* Enhancement: Status History Fields: Finally got the values translated into something meaningful.
+
+The field value will be returned as
+
+{code}
+"Statusverlauf":{
+	"Rejected":null,
+	"New":{
+		"User":"rhannemann",
+		"Date":"Tue Apr 01 09:00:16 CEST 2014"
+	},
+	"Closed":{
+		"User":"rhannemann",
+		"Date":"Fri Apr 18 10:35:27 CEST 2014"
+	},
+	"Resolved":{
+		"User":"rhannemann",
+		"Date":"Tue Apr 01 09:00:16 CEST 2014"
+	},
+	"Assigned":null
+}
+{code}
+
+or
+
+{code}
+"Statusverlauf":{
+	"0":{
+		"User":"rhannemann",
+		"Date":"Tue Apr 01 09:00:16 CEST 2014"
+	},
+	"1":null,
+	"2":{
+		"User":"rhannemann",
+		"Date":"Tue Apr 01 09:00:16 CEST 2014"
+	},
+	"3":null,
+	"4":{
+		"User":"rhannemann",
+		"Date":"Fri Apr 18 10:35:27 CEST 2014"
+	}
+}
+{code}
+
+depending of the optional parameter (translateSelectionFields=true / translateSelectionFields=false)
+
+h3. Version 0.12
+
+* Chunking added for large queries
+* Moved documentation to HTML
+* Translation of FieldIDs to FieldNames activated as default
+* Translation of Selection Field Values to Character presentation activated as default
+* Translation for GET operations for Date/Time, Date and Time fields checked
+* Translation for POST / PUT operations added for Date/Time fields. Value needs to be provided in the following format: _"EEE MMM dd HH:mm:ss zzz yyyy"_ with the date locale US.
+* Translation added for currency fields for GET/POST/PUT
+* Attachments added for GET/POST/PUT
+* *Handling of null values changed*: They will now be returned as _null_ instead of _"null"_
+* *Handling of numerical(Integer, Decimal, ...) values changed*: They will now be returned as _1.4_ instead of _"1.4"_ 
