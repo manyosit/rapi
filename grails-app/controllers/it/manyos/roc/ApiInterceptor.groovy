@@ -1,6 +1,5 @@
 package it.manyos.roc
 
-
 class ApiInterceptor {
 
     boolean before() {

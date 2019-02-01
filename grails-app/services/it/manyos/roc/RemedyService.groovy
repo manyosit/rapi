@@ -4,7 +4,6 @@ import grails.transaction.Transactional
 import com.bmc.arsys.api.*
 import it.manyos.roc.FieldDetails
 import groovy.json.*
-import org.hibernate.SessionFactory;
 
 @Transactional
 class RemedyService {
@@ -16,6 +15,7 @@ class RemedyService {
     def UtilService
     def DataParser
 
+    /*
     def processMetrics() {
         //def session = sessionFactory.getCurrentSession()
         ARServerUser context = new ARServerUser();
@@ -68,7 +68,7 @@ class RemedyService {
 
         }
 
-    }
+    }*/
 
     def getCurrentLicenses(ARServerUser context) {
         def licenseStats = [:]
@@ -118,10 +118,6 @@ class RemedyService {
         return licenseStats
     }
 
-    def getARContext(Server server) {
-        return getARContext(server.name, server.port.intValue(), server.username, server.password)
-    }
-
     def getARContext(String server, int port, String user, String password) {
         ARServerUser ctx = new ARServerUser();
         ctx.setServer(server);
@@ -131,6 +127,23 @@ class RemedyService {
         ctx.setPassword(password);
         ctx.verifyUser()
         log.debug "Connected."
+        return ctx
+    }
+
+    def getARContext(String server, int port, String user, String password, String impersonateUser) {
+        ARServerUser ctx = getARContext(server, port, user, password)
+        ctx.impersonateUser(impersonateUser)
+        log.error "impersonated User " + impersonateUser
+        return ctx
+    }
+
+    def getARContext(String server, int port) {
+        ARServerUser ctx = ARServerUser ctx = getARContext(server, port, UtilService.getUsername(), UtilService.getPassword())
+        return ctx
+    }
+
+    def getARContext(String server, int port, String impersonateUser) {
+        ARServerUser ctx = getARContext(server, port, UtilService.getUsername(), UtilService.getPassword(), impersonateUser)
         return ctx
     }
 
@@ -484,31 +497,26 @@ class RemedyService {
      * @return returns a TreeMap with all entry ids and any errors
      */
     def updateEntries(ARServerUser context, String schema, entryObject) {
-        log.error("Entries: " + entryObject.size())
+        log.debug("Entries: " + entryObject.size())
         def recordId = entryObject['id']
         def values = entryObject['values']
         //loadfieldlist
         def myEntry = null
-        log.error("Entries: " + recordId + ": " + values)
+        log.debug("Entries: " + recordId + ": " + values)
         def fieldCache = getFields(context, schema)
         def returnValue = [:]
-        try {
-            int[] fields = [1,2]
-            myEntry = context.getEntry(schema, recordId, fields)
-            log.error("Entries: " + myEntry)
-            myEntry = UtilService.setEntry(myEntry, values, fieldCache)
-            //Save entry
-            log.error("Entries set: " + myEntry)
-            context.setEntry(schema, recordId, myEntry, new Timestamp(), 0)
-            returnValue['message'] = 'success'
-            log.error("Entries: " + myEntry)
-        } catch (Exception updateException) {
-            //updateException.printStackTrace()
-            log.error "API Service: " + updateException
-            returnValue['message'] = updateException.toString()
 
-            //allEntries.put(it, updateException.toString())
-        }
+        int[] fields = [1,2]
+        myEntry = context.getEntry(schema, recordId, fields)
+        log.debug("Entries: " + myEntry)
+        myEntry = UtilService.setEntry(myEntry, values, fieldCache)
+        //Save entry
+        log.debug("Entries set: " + myEntry)
+        context.setEntry(schema, recordId, myEntry, new Timestamp(), 0)
+        returnValue['message'] = 'success'
+        returnValue['entry'] = myEntry
+        log.debug("Entries: " + myEntry)
+
         /*def allEntries = new TreeMap();
         entryObject.keySet().each {
             try {

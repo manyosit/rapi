@@ -146,18 +146,16 @@ class ApiController {
         def showDisplayOnlyFields = false
         def cacheResults = false
         def cacheTime = 600000
+        def impersonateUser = null
         ArrayList fields = null;
         ARServerUser context = new ARServerUser();
         try {
-            //check for environment
-            if (params.environment == null || params.environment == '')
-                throw new Exception("Environment not provided")
-            def environment = RemedyEnvironment.get(params.environment)
-            if (!environment)
-                throw new Exception("Environment not found")
-            def server = environment.server[0]
-            log.debug("Server: " + server)
-            context = remedyService.getARContext(server)
+            if (params.impersonateUser ) {
+                impersonateUser = params.impersonateUser
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0, impersonateUser)
+            } else {
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
+            }
             //context = remedyService.getARContext("server", 0.intValue(), "a", "v")
             //def records
             //Set parameter
@@ -289,17 +287,19 @@ class ApiController {
                     log.debug it
                 }*/
                 returnValue = remedyService.updateEntries(context, params.form, request.XML)
-                render returnValue as XML
+                render(status: 200, text: returnValue) as XML
             } else {
                 returnValue = remedyService.updateEntries(context, params.form, request.JSON)
-                render returnValue as JSON
+                render(status: 200, text: returnValue) as JSON
+                //render returnValue as JSON
             }
         } catch (Exception e) {
+            if (params.format && params.format.equalsIgnoreCase("XML")) {
+                render(status: 500, text: e.getMessage()) as XML
+            } else {
+                render(status: 500, text: e.getMessage()) as JSON
+            }
             log.error(e.getMessage())
-            if (e.getCause() == null)
-                render e.getClass().getSimpleName().toString() + ": " + e.toString()
-            else
-                render e.getClass().getSimpleName().toString() + ": " + (e.getCause().toString());
         } finally {
             context.logout()
         }
