@@ -206,9 +206,10 @@ class ApiController {
                 returnValue['runtime'] = new Date().getTime() - startDate.getTime()
                 returnValue['dataSize'] = records.size()
                 returnValue['data'] = records
-                if (records.size==0) {
+                //Pobiert, war aber nix
+                /*if (records.size==0) {
                     response.status = 404
-                }
+                }*/
                 if (format == "XML")
                     render returnValue as XML
                 else
