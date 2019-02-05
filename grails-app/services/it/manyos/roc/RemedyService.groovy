@@ -302,10 +302,18 @@ class RemedyService {
         def fieldIds = new ArrayList();
 
 
-        if (fields != null)
-            fieldIds = fields
 
-        else {
+        if (fields != null) {
+            //fieldIds = fields
+            formFields.each { field ->
+                fields.each { givenField ->
+                    givenField = givenField.trim()
+                    //loop given fields and compare Name and ID
+                    if (field.fieldId.toString() == givenField || field.name.equalsIgnoreCase(givenField))
+                        fieldIds.add(field.fieldId);
+                }
+            }
+        } else {
             formFields.each { field ->
                 if (dataFields.contains(field.type)) {
                     if (field.entryMode != "Display-only" && field.fieldId != 15)

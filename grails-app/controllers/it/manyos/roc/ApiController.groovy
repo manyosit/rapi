@@ -206,7 +206,9 @@ class ApiController {
                 returnValue['runtime'] = new Date().getTime() - startDate.getTime()
                 returnValue['dataSize'] = records.size()
                 returnValue['data'] = records
-
+                if (records.size==0) {
+                    response.status = 404
+                }
                 if (format == "XML")
                     render returnValue as XML
                 else
@@ -214,7 +216,7 @@ class ApiController {
             }
         } catch (Exception e) {
             returnValue['status'] = 'error'
-
+            response.status = 500
             if (e.getCause() == null) {
                 //render e.getClass().getSimpleName().toString() + ": " + e.toString()
                 returnValue['message'] = e.getClass().getSimpleName().toString() + ": " + e.toString()
