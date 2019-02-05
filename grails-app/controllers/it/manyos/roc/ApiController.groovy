@@ -323,10 +323,11 @@ class ApiController {
             }
         } catch (Exception e) {
             log.error(e.getMessage())
-            if (e.getCause() == null)
-                render e.getClass().getSimpleName().toString() + ": " + e.toString()
-            else
-                render e.getClass().getSimpleName().toString() + ": " + (e.getCause().toString());
+            if (params.format && params.format.equalsIgnoreCase("XML")) {
+                render(status: 500, text: e.getMessage()) as XML
+            } else {
+                render(status: 500, text: e.getMessage()) as JSON
+            }
         } finally {
             context.logout()
         }
@@ -362,10 +363,11 @@ class ApiController {
             }
         } catch (Exception e) {
             log.error(e.getMessage())
-            if (e.getCause() == null)
-                render e.getClass().getSimpleName().toString() + ": " + e.toString()
-            else
-                render e.getClass().getSimpleName().toString() + ": " + (e.getCause().toString());
+            if (params.format && params.format.equalsIgnoreCase("XML")) {
+                render(status: 500, text: e.getMessage()) as XML
+            } else {
+                render(status: 500, text: e.getMessage()) as JSON
+            }
         } finally {
             context.logout()
         }
@@ -388,10 +390,11 @@ class ApiController {
             response.outputStream << context.getEntryBlob(params.form, params.entryId, Integer.parseInt(params.fieldId))
         } catch (Exception e) {
             log.error(e.getMessage())
-            if (e.getCause() == null)
-                render e.getClass().getSimpleName().toString() + ": " + e.toString()
-            else
-                render e.getClass().getSimpleName().toString() + ": " + (e.getCause().toString());
+            if (params.format && params.format.equalsIgnoreCase("XML")) {
+                render(status: 500, text: e.getMessage()) as XML
+            } else {
+                render(status: 500, text: e.getMessage()) as JSON
+            }
         } finally {
             context.logout()
         }
@@ -421,10 +424,11 @@ class ApiController {
             }
         } catch (Exception e) {
             log.error(e.getMessage())
-            if (e.getCause() == null)
-                render e.getClass().getSimpleName().toString() + ": " + e.toString()
-            else
-                render e.getClass().getSimpleName().toString() + ": " + (e.getCause().toString());
+            if (params.format && params.format.equalsIgnoreCase("XML")) {
+                render(status: 500, text: e.getMessage()) as XML
+            } else {
+                render(status: 500, text: e.getMessage()) as JSON
+            }
         } finally {
             context.logout()
         }
