@@ -14,4 +14,4 @@ ENTRYPOINT ["grails"]
 
 EXPOSE 8080
 
-CMD ["run"]
+CMD ["prod", "run-app"]
