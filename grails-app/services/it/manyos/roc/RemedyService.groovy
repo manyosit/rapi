@@ -268,26 +268,8 @@ class RemedyService {
     def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime, ArrayList fields) {
         log.debug "Cache results " + cacheResults
 
-        def serverCache = resultCache.get(context.getServer())
         def userCache = null
         def schemaCache = null;
-        if (serverCache != null) {
-            log.debug "Server Cache found"
-            userCache = serverCache.get(context.getUser())
-            if (userCache != null) {
-                log.debug "User Cache found"
-                schemaCache = userCache.get(schema)
-                if (schemaCache != null) {
-                    log.debug "Schema Cache found"
-                    def cachedRecords = schemaCache.get(query)
-                    if (cachedRecords != null && ((new Date().getTime() - cachedRecords.cacheDate.getTime()) < cacheTime)) {
-                        log.debug "load records from cache"
-                        log.debug "cache valid since " + (new Date().getTime() - cachedRecords.cacheDate.getTime()) + " msecs. Max cache time " + cacheTime + " msecs"
-                        return cachedRecords.records
-                    }
-                }
-            }
-        }
 
         def formFields = getFields(context, schema)
         def dataFields = ["CharacterField", "CurrencyField", "DateOnlyField", "DateTimeField", "DecimalField", "DiaryField", "IntegerField", "RealField", "SelectionField", "TimeOnlyField"]
@@ -399,20 +381,6 @@ class RemedyService {
             allRecords.add(recordData)
         }
         log.debug "Query returned " + allRecords.size() + " records "
-        if (cacheResults) {
-            def myCache = new RecordCache(schema:schema, cacheDate:new Date(), records:allRecords)
-            //Initialize Objects if not found
-            if (serverCache == null)
-                serverCache = new HashMap()
-            if (userCache == null)
-                userCache = new HashMap()
-            if (schemaCache == null)
-                schemaCache = new HashMap()
-            schemaCache[query] = myCache
-            userCache[schema] = schemaCache
-            serverCache[context.getUser()] = userCache
-            resultCache[context.getServer()] = serverCache
-        }
         return allRecords
     }
 
