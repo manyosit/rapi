@@ -13,61 +13,6 @@ class RemedyService {
     def UtilService
     def DataParser
 
-    /*
-    def processMetrics() {
-        //def session = sessionFactory.getCurrentSession()
-        ARServerUser context = new ARServerUser();
-
-        def metrics = Metric.all;
-        metrics.each { myMetric ->
-            myMetric.remedyEnvironments.each { myEnvironment ->
-                def startDate = new Date()
-                myEnvironment.server.each { Server myServer ->
-                    def startDateEach = new Date()
-                    def resultValue = ''
-                    def status = 'success'
-                    //add some basic failsafe function
-                    try {
-                        context = getARContext(myServer.name, myServer.port.intValue(), myServer.username, myServer.password)
-                        //context = RemedyService.getARContext("54.201.167.131",46200, myServer.username, "Yaq12wsx#")
-                        //run Metric
-                        if (myMetric.category == 'Count') {
-                            resultValue = countRecords(context, myMetric.form, myMetric.query)
-                        } else if (myMetric.category == 'Value') {
-                            resultValue = queryForm(context, myMetric.form, myMetric.query, true, true, 0.intValue(), 0.intValue(), false)
-                        } else if (myMetric.category == 'License') {
-                            resultValue = getCurrentLicenses(context)
-                        }
-
-                    } catch (Exception e) {
-                        //resultValue = ['message':e.getLocalizedMessage()]
-                        resultValue = ['message':'failed']
-                        //println "Error while processing " + myMetric + "@" + myServer
-                        status = 'failed'
-                    }
-                    //println(resultValue)
-                    def jsonValue = new JsonBuilder( resultValue ).toPrettyString()
-                    println(jsonValue)
-                    println "Save metric"
-                    def duration = new Date().getTime() - startDateEach.getTime()
-                    def newResult = new MetricResult(
-                                executionDate: startDate,
-                                metric: myMetric,
-                                status: status,
-                                value: jsonValue,
-                                server: myServer,
-                                runtime: duration)
-                            .save(failOnError:true, flush:true)
-                    println "New Result: " + newResult + " id: " + newResult.id
-                }
-            }
-            //session.flush()
-            //session.clear()
-
-        }
-
-    }*/
-
     def getCurrentLicenses(ARServerUser context) {
         def licenseStats = [:]
 

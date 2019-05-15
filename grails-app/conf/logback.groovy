@@ -36,6 +36,5 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
 }
 else {
     root(ERROR, ['STDOUT'])
-    logger("grails.app", DEBUG, ['STDOUT'])
-    logger("com.bmc.rsso", DEBUG, ['STDOUT'])
+    logger("grails.app", ERROR, ['STDOUT'])
 }

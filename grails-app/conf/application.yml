@@ -84,9 +84,5 @@ endpoints:
 ---
 environments:
   development:
-    authentication:
-      rsso-enabled: false
   test:
   production:
-    authentication:
-      rsso-enabled: true
