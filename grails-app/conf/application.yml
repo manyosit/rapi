@@ -6,6 +6,10 @@ grails:
   spring:
     transactionManagement:
       proxies: false
+  controllers:
+    upload:
+      maxFileSize: 200000000
+      maxRequestSize: 200000000
 
 info:
   app:

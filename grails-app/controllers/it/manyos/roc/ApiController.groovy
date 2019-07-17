@@ -377,7 +377,12 @@ class ApiController {
         log.debug params
         ARServerUser context = new ARServerUser();
         try {
-            context = ApiService.getARContext(params.server, params.port?.toInteger() ?:0)
+            if (params.impersonateUser ) {
+                impersonateUser = params.impersonateUser
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0, impersonateUser)
+            } else {
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
+            }
             int[] fieldIds = [Integer.parseInt(params.fieldId)]
             def myEntry = context.getEntry(params.form, params.entryId, fieldIds)
             //log.debug myEntry
@@ -402,12 +407,16 @@ class ApiController {
 
 
     def setAttachment() {
-        log.debug params
-        log.debug request.toString()
+        //log.debug params
+        //log.debug request.toString()
         ARServerUser context = new ARServerUser();
         try {
-            context = ApiService.getARContext(params.server, params.port?.toInteger() ?:0)
-
+            if (params.impersonateUser ) {
+                impersonateUser = params.impersonateUser
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0, impersonateUser)
+            } else {
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
+            }
             if (request instanceof MultipartHttpServletRequest){
                 //log.debug request.getFileNames().toString()
                 //Get the file's name from request
@@ -416,7 +425,7 @@ class ApiController {
                 def uploadedFile = request.getFile(fileName)
                 //log.debug(fileName)
                 //log.debug uploadedFile.getBytes()
-                render ApiService.setAttachment(context, params.form, params.entryId, Integer.parseInt(params.fieldId), fileName, uploadedFile)
+                render remedyService.setAttachment(context, params.form, params.entryId, Integer.parseInt(params.fieldId), fileName, uploadedFile)
             } else {
                 def returnValue = new HashMap()
                 returnValue[params.entryId] = "error: No file provied"
