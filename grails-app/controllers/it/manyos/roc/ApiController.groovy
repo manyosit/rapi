@@ -374,7 +374,7 @@ class ApiController {
     }
 
     def getAttachment() {
-        log.debug params
+        //log.debug params
         ARServerUser context = new ARServerUser();
         try {
             if (params.impersonateUser ) {
