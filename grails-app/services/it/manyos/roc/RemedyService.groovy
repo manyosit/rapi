@@ -317,7 +317,7 @@ class RemedyService {
                     recordValue = record.get(i).getValue().toString().toString()
 
                 if (returnFieldNames)
-                    myRecordValues[myField.name] = "" + recordValue
+                    myRecordValues[myField.name] = recordValue
                 else
                     myRecordValues[i] = recordValue
             }
