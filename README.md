@@ -1,18 +1,6 @@
-# roc-server
-Grails Applikation die sich in Remedy SSO integriert und API call unter dem Account des Users ermöglicht.
+# rapi
+Grails Applikation to access BMC Remedy the RESTful
 
-Die SSO Integration wird in der resources.groovy aktiviert:
+e.g.: http://localhost:8080/<servername>/<formname>/<query>?port=1234&fields=1,179
 
-    beans = {
-        def activate = grailsApplication.config.getProperty('authentication.rsso-enabled')
-
-        log.debug("RSSO activate status = " +activate)
-
-        if (activate) {
-            myFilter(FilterRegistrationBean) {
-                filter = new com.bmc.rsso.agent.RSSOFilter()
-                order = Ordered.HIGHEST_PRECEDENCE
-                urlPatterns = ["/*"]
-            }
-        }
-    }
+http://localhost:8080/pier1/AST:BaseElement/1=1?port=9502&fields=1,179
