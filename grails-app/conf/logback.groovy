@@ -31,6 +31,7 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
             pattern = "%level %logger - %msg%n"
         }
     }
+    logger("grails.app", DEBUG, ['STDOUT'])
     logger("StackTrace", ERROR, ['FULL_STACKTRACE'], false)
     root(ERROR, ['STDOUT', 'FULL_STACKTRACE'])
 }

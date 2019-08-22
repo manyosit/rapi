@@ -139,6 +139,7 @@ class RemedyService {
                 }
             }
         }
+        log.debug "load schema definition - fetched from server"
         //throw new Exception("Form not found")
         def fields = context.getListFieldObjects(schema)
         def allFields = new ArrayList()
@@ -155,7 +156,7 @@ class RemedyService {
                 entryMode = "System"
             //Set FieldType
             def fieldType = it.getClass().getSimpleName().toString()
-            log.debug it.getFieldLimit().toString()
+            log.debug "read field definition" + it
             //Create field
             def myField = new FieldDetails(name:it.getName(), fieldId:it.getFieldID(), type:fieldType, entryMode: entryMode, fieldLimit:it.getFieldLimit())
             //Remove qualifier from fieldlimits due to
