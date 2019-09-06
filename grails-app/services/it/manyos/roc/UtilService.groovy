@@ -4,8 +4,9 @@ import com.bmc.arsys.api.CurrencyValue
 import com.bmc.arsys.api.StatusHistoryValue
 import com.bmc.arsys.api.Value
 import com.sun.xml.internal.ws.client.sei.ValueSetter.ReturnValue
-import org.grails.web.util.WebUtils;
+import org.grails.web.util.WebUtils
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat
 
 //import org.codehaus.groovy.grails.web.util.WebUtils
@@ -41,24 +42,49 @@ class UtilService {
 	}
 	
 	def Value getFieldValue(fieldType, JSONValue) {
-		SimpleDateFormat dateParser = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+		//SimpleDateFormat dateParser = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
 		def value = new Value()
 		/*if (JSONValue.equals("\$NULL\$"))
 			return new Value(null)
 		log.debug "Field: " + fieldType + " " + JSONValue*/
 		
 		if (fieldType.equals("DateTimeField")) {
-			value = new Value(dateParser.parse(JSONValue).getTime() / 1000)
+			value = new Value(parseDate(JSONValue).getTime() / 1000)
 		} else if (fieldType.equals("CurrencyField")) {
 			def myValue = new CurrencyValue()
 			myValue.setValue(JSONValue.value)
 			myValue.setCurrencyCode(JSONValue.currencyCode)
-			myValue.setConversionDate((long)dateParser.parse(JSONValue.conversionDate).getTime() / 1000)
+			myValue.setConversionDate((long)parseDate(JSONValue.conversionDate).getTime() / 1000)
 			value = new Value(myValue)
 		} else
 			value = new Value(JSONValue)
 			
 		return value
+	}
+
+	Date parseDate(dateString) {
+		List<SimpleDateFormat> knownPatterns = new ArrayList<SimpleDateFormat>();
+		knownPatterns.add(new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm.ss'Z'"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss"));
+		knownPatterns.add(new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ssXXX"));
+		knownPatterns.add(new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss'Z'"));
+		knownPatterns.add(new SimpleDateFormat("dd.MM.yyyy'T'HH:mm.ss'Z'"));
+		knownPatterns.add(new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss"));
+		knownPatterns.add(new SimpleDateFormat("dd.MM.yyyy' 'HH:mm:ss"));
+		knownPatterns.add(new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ssXXX"));
+
+		for (SimpleDateFormat pattern : knownPatterns) {
+			try {
+				// Take a try
+				return new Date(pattern.parse(dateString).getTime());
+			} catch (ParseException pe) {
+				// Loop on
+			}
+		}
+		throw new ParseException("Can't parse String " + dateString + " to Date");
 	}
 	
 	/**

@@ -110,6 +110,7 @@ class ApiController {
     }*/
 
     def get() {
+        log.debug "Execute get with params: " + params
         def returnValue = [:]
         returnValue['status'] = 'success'
         def startDate = new Date()
