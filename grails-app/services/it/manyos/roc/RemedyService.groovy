@@ -198,8 +198,8 @@ class RemedyService {
      * @param maxRows The number of rows to return. 0 = all entries
      * @return returns all records as HashMap
      */
-    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime) {
-        return queryForm(context, schema, query, returnFieldNames, translateSelectionFields, firstEntry, maxEntries, showDisplayOnlyFields, cacheResults, cacheTime, null);
+    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime, String dateFormat) {
+        return queryForm(context, schema, query, returnFieldNames, translateSelectionFields, firstEntry, maxEntries, showDisplayOnlyFields, cacheResults, cacheTime, dateFormat);
     }
 
 
@@ -211,7 +211,7 @@ class RemedyService {
      * @param maxRows The number of rows to return. 0 = all entries
      * @return returns all records as HashMap
      */
-    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime, ArrayList fields) {
+    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime, ArrayList fields, String dateFormat) {
         log.debug "Cache results " + cacheResults
 
         def userCache = null
@@ -283,7 +283,8 @@ class RemedyService {
                         recordValue = record.get(i).getValue()
                 } else if (myField.getType().equals("DateTimeField") && record.get(i).getValue().getClass().getSimpleName().toString().equals("Timestamp")) {
                     //Handle TimeStamp
-                    recordValue = record.get(i).getValue().toDate().toString()
+                    //recordValue = record.get(i).getValue().toDate().toString()
+                    recordValue = record.get(i).getValue().toDate().format(dateFormat);
                 } else if (record.get(i).getValue() != null && record.get(i).getValue().getClass().getSimpleName().toString().equals("DiaryListValue")) {
                     def diaryValues = new ArrayList()
                     record.get(i).getValue().each { diaryItem ->

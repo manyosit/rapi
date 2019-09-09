@@ -125,6 +125,7 @@ class ApiController {
         def cacheResults = false
         def cacheTime = 600000
         def impersonateUser = null
+        def dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
         ArrayList fields = null;
         ARServerUser context = new ARServerUser();
         try {
@@ -151,6 +152,8 @@ class ApiController {
                 showServerStatistics = true
             if (params.showDisplayOnlyFields && params.showDisplayOnlyFields.equalsIgnoreCase("true"))
                 showDisplayOnlyFields=true
+            if (params.dateFormat)
+                dateFormat=params.dateFormat;
             if (params.cacheResults && params.cacheResults.equalsIgnoreCase("true"))
                 cacheResults=true
             if (params.cacheTime)
@@ -198,7 +201,11 @@ class ApiController {
                         translateSelectionFields,
                         params.firstEntry?.toInteger() ?:0,
                         params.maxEntries?.toInteger() ?:0,
-                        showDisplayOnlyFields, cacheResults, cacheTime, fields)
+                        showDisplayOnlyFields,
+                        cacheResults,
+                        cacheTime,
+                        fields,
+                        dateFormat);
 
                 returnValue['status'] = 'success'
                 returnValue['query'] = params.query
