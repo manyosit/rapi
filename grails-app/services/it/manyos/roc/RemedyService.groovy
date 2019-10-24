@@ -198,8 +198,8 @@ class RemedyService {
      * @param maxRows The number of rows to return. 0 = all entries
      * @return returns all records as HashMap
      */
-    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime, String dateFormat) {
-        return queryForm(context, schema, query, returnFieldNames, translateSelectionFields, firstEntry, maxEntries, showDisplayOnlyFields, cacheResults, cacheTime, dateFormat);
+    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime, String dateFormat, String sortString) {
+        return queryForm(context, schema, query, returnFieldNames, translateSelectionFields, firstEntry, maxEntries, showDisplayOnlyFields, cacheResults, cacheTime, dateFormat, sortString);
     }
 
 
@@ -211,7 +211,7 @@ class RemedyService {
      * @param maxRows The number of rows to return. 0 = all entries
      * @return returns all records as HashMap
      */
-    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime, ArrayList fields, String dateFormat) {
+    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime, ArrayList fields, String dateFormat, String sortString) {
         log.debug "Cache results " + cacheResults
 
         def userCache = null
@@ -224,6 +224,12 @@ class RemedyService {
             query = "'1' != \$NULL\$"
         def allRecords = []
         QualifierInfo qual = context.parseQualification(schema, query);
+
+        def sortInfoList = new ArrayList();
+        //Prepare SortInfo
+        if (sortString != null) {
+            sortInfoList = UtilService.getSortInfo(sortString, formFields);
+        }
 
         //log.debug "Qualifier: " + qual.toString();
 
@@ -254,7 +260,7 @@ class RemedyService {
 
 
         //List<EntryListInfo> eListInfos = context.getListEntry(schema, qual, firstEntry, maxEntries, null, null, false, null);
-        def records = context.getListEntryObjects(schema, qual, firstEntry, maxEntries, null, fieldIds as int[] , false, null)
+        def records = context.getListEntryObjects(schema, qual, firstEntry, maxEntries, sortInfoList, fieldIds as int[] , false, null)
 
         records.each { record ->
             def recordData = [:]

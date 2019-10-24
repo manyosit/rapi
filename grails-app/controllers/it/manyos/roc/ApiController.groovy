@@ -14,100 +14,8 @@ class ApiController {
 
     def remedyService
 
-    /*def getNewFieldID() {
-        def returnValue = [:]
-        def fieldID = 0
-        def message = 'success'
-        def environment = RemedyEnvironment.get(params.id)
-        if (!environment) {
-            message = 'Error. Environment not found'
-        } else {
-            fieldID = environment.lastFieldID+1
-            environment.lastFieldID = fieldID;
-            environment.save(flush: true)
-            returnValue['fieldID'] = fieldID
-        }
-        returnValue['message'] = message
-        render returnValue as JSON
-    }*/
-
     def index() {
     }
-
-    /*def licenseCount() {
-        TreeMap totals = [:]
-        def max=params.max?:100
-        def myMetric = Metric.get(2)
-        def results = myMetric.results
-        /*def results = MetricResult.findAllByMetric(myMetric,
-                [max: max, sort: "executionDate", order: "desc", offset: 0])
-        println(results.size())*/
-    /*
-        def jsonSlurper = new JsonSlurper()
-        results.each {
-
-            def myObject = jsonSlurper.parseText(it.value)
-            def date = it.executionDate.format("yyyy-MM-dd HH:mm")
-
-            def licenseData = [:]
-            if (totals[date])
-                licenseData = totals[date]
-
-            //totals[date]
-            def arServer = myObject."AR Server"
-            if (arServer) {
-                //Get AR Data
-                def fixed = arServer.fixed?:0
-                def floating = arServer.floating?:0
-                def read = arServer.read?:0
-
-                if (licenseData.'arFixed')
-                    licenseData['arFixed'] = licenseData['arFixed'] + fixed
-                else
-                    licenseData['arFixed'] = fixed
-
-                if (licenseData.'arFloating')
-                    licenseData['arFloating'] = licenseData['arFloating'] + floating
-                else
-                    licenseData['arFloating'] = floating
-
-                if (licenseData.'arRead')
-                    licenseData['arRead'] = licenseData['arRead'] + read
-                else
-                    licenseData['arRead'] = read
-
-                totals[date] = licenseData
-
-            }
-        }
-        def allValues = []
-        //Reverse Sort
-        Comparator comparator = [compare: {a , b -> b.compareTo(a) }] as Comparator
-        //Map sortedMap = new TreeMap(comparator)
-        //sortedMap.putAll(totals)
-
-        totals.keySet().each {
-            def resultValue = ['executionDate':it, 'licenseData':totals[it]]
-            allValues.add(resultValue)
-        }
-        def renderValue = ['results':allValues]
-        render renderValue as JSON
-    }*/
-
-    /*def environments = {
-        def environmentList = []
-        def environments = RemedyEnvironment.findAll()
-        environments.each {
-            def myEnvironment = [:]
-            myEnvironment['id'] = it.id
-            myEnvironment['name'] = it.name
-            myEnvironment['category'] = it.category
-            environmentList.add(myEnvironment)
-        }
-        //println environments
-        def returnValue = ['environments':environmentList]
-        render returnValue as JSON
-    }*/
 
     def get() {
         log.debug "Execute get with params: " + params
@@ -122,6 +30,7 @@ class ApiController {
         def showServerConfig = false
         def showServerStatistics = false
         def showDisplayOnlyFields = false
+        def sortString = null
         def cacheResults = false
         def cacheTime = 600000
         def impersonateUser = null
@@ -158,6 +67,8 @@ class ApiController {
                 cacheResults=true
             if (params.cacheTime)
                 cacheTime=params.cacheTime
+            if (params.sort)
+                sortString=params.sort
             if (params.fields)
                 fields=params.fields.tokenize( ',' );
 
@@ -205,7 +116,8 @@ class ApiController {
                         cacheResults,
                         cacheTime,
                         fields,
-                        dateFormat);
+                        dateFormat,
+                        sortString);
 
                 returnValue['status'] = 'success'
                 returnValue['query'] = params.query

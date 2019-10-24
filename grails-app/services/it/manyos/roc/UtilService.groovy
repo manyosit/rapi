@@ -1,6 +1,7 @@
 package it.manyos.roc
 
 import com.bmc.arsys.api.CurrencyValue
+import com.bmc.arsys.api.SortInfo
 import com.bmc.arsys.api.StatusHistoryValue
 import com.bmc.arsys.api.Value
 import com.sun.xml.internal.ws.client.sei.ValueSetter.ReturnValue
@@ -153,5 +154,33 @@ class UtilService {
 		}
 		//log.debug returnValue
 		return returnValue
+	}
+
+	def getSortInfo(String sortString, fieldCache) {
+		def sortInfoList = new ArrayList();
+		log.debug "prepare sort: " + sortString;
+		def sortArray = sortString.split(',');
+		sortArray.each {sortItem ->
+			sortItem = sortItem.trim();
+			def sortOrder = 1;
+			if (sortItem.startsWith('-')) {
+				sortOrder = 2;
+				sortItem = sortItem.substring(1);
+			}
+			def fieldId = -1
+			try {
+				fieldId = Integer.parseInt(sortItem)
+			} catch (Exception e1) {
+				fieldId = getFieldId(fieldCache, sortItem)
+			}
+			if (fieldId == -1)
+				throw new Exception("Field: "+ sortItem + " not found on form ")
+			else {
+				def sortInfo = new SortInfo(fieldId, sortOrder);
+				sortInfoList.add(sortInfo);
+			}
+			log.debug "prepare sortfield " + sortItem + "(" + fieldId + ")" + " order " + sortOrder
+		}
+		return sortInfoList
 	}
 }
