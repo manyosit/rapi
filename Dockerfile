@@ -24,6 +24,10 @@ WORKDIR /app
 # Copy App files
 COPY . /app
 
+RUN groupadd -g 999 appuser && \
+    useradd -r -u 999 -g appuser appuser
+USER appuser
+
 # Run Grails dependency-report command to pre-download dependencies but not
 # create unnecessary build files or artifacts.
 RUN grails dependency-report
