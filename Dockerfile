@@ -1,7 +1,7 @@
 FROM java:8
 MAINTAINER Robert Hannemann
 
-ENV GRAILS_VERSION 4.0.11
+ENV GRAILS_VERSION 4.0.10
 
 # Install Grails
 WORKDIR /usr/lib/jvm
