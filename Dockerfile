@@ -9,20 +9,24 @@ RUN wget https://github.com/grails/grails-core/releases/download/v$GRAILS_VERSIO
     unzip grails-$GRAILS_VERSION.zip && \
     rm -rf grails-$GRAILS_VERSION.zip && \
     ln -s grails-$GRAILS_VERSION grails
-
 # Setup Grails path.
 ENV GRAILS_HOME /usr/lib/jvm/grails
 ENV PATH $GRAILS_HOME/bin:$PATH
 
+RUN groupadd -g 999 appuser && \
+    useradd -r -m -u 999 -g appuser appuser
+
 # Create App Directory
 RUN mkdir /app
+RUN chown -R 999:999 /app
+
+USER appuser
 
 # Set Workdir
 WORKDIR /app
 
-
 # Copy App files
-COPY . /app
+COPY --chown=appuser . /app
 
 # Run Grails dependency-report command to pre-download dependencies but not
 # create unnecessary build files or artifacts.
@@ -33,9 +37,5 @@ RUN grails package
 ENTRYPOINT ["grails"]
 
 EXPOSE 8080
-
-#RUN groupadd -g 999 appuser && \
-#    useradd -r -u 999 -g appuser appuser
-#USER appuser
 
 CMD ["prod", "run-app"]
