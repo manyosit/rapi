@@ -1,7 +1,7 @@
 FROM java:8
 MAINTAINER Robert Hannemann
 
-ENV GRAILS_VERSION 3.3.9
+ENV GRAILS_VERSION 3.3.11
 
 # Install Grails
 WORKDIR /usr/lib/jvm
@@ -34,8 +34,8 @@ ENTRYPOINT ["grails"]
 
 EXPOSE 8080
 
-RUN groupadd -g 999 appuser && \
-    useradd -r -u 999 -g appuser appuser
-USER appuser
+#RUN groupadd -g 999 appuser && \
+#    useradd -r -u 999 -g appuser appuser
+#USER appuser
 
 CMD ["prod", "run-app"]
