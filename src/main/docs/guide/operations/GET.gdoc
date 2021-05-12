@@ -1,0 +1,383 @@
+h3. Optional Parameters / General handling 
+
+The following optional parameters can be used to change the behavior of the GET operation.
+
+h4. Field IDs
+
+By default the application returns field names. If required the parameter _fieldNames=false_ can be provided in URL to return field ids instead. 
+e.g. 
+{code}http://localhost:8080/arapi/arserver123.mydomain.de/HPD:Help%20Desk/'1'="INC000000000604"?fieldNames=false{code}
+
+For all _POST / PUT_ operations you can address fields by name or id.
+
+h4. Selection Fields
+
+By default the application returns the character presentation for all Selection Fields. E.g. The value _Deployed_ for the field _AssetLifecylcleStatus_ will be returned instead of its internal numerical value _3_. With the optional parameter _translateSelectionFields=false_ this can be changed to return _3_ instead.
+
+e.g. 
+{code}http://localhost:8080/arapi/arserver123.mydomain.de/HPD:Help%20Desk/'1'="INC000000000604"?translateSelectionFields=false{code}
+
+h4. showDisplayOnlyFields
+
+With this parameter set to true also Display Only fields will be returned in a query. While they will always be empty this functionality might be useful to fire workflow on a Get operation.
+
+Defaults to false
+
+h4. Chunking
+
+Chunking allows you to receive a large amount of records in small chunks. e.g. you want to receive all records in chunks with 1000 records each. The first query will set the parameter firstEntry to 0 and the parameter maxEntries to 1000. This will return records 1 - 1000. The second query will set the parameter firstEntry to 1000 and the parameter maxEntries to 1000. This will return the records 1001 - 2000.
+
+Two optional parameters are available:
+
+firstEntry: The first entry to return. Defaults to 0
+maxEntries: The number of entries to return with this chunk. Defaults to 0 (all)
+
+Samples
+
+{code}http://localhost:8080/arapi/arserver123.mydomain.de/HPD:Help%20Desk/'1' LIKE "INC00000000060%"?firstEntry=1000&maxEntries=1000{code}
+
+{code}http://localhost:8080/arapi/arserver123.mydomain.de/HPD:Help%20Desk/'1' LIKE "INC00000000060%"?firstEntry=140{code}
+
+{code}http://localhost:8080/arapi/arserver123.mydomain.de/HPD:Help%20Desk/'1' LIKE "INC00000000060%"?maxEntries=10{code}
+
+h4. Attachment Fields
+
+If an attachment is stored in the current record it will not be returned with the query operation. Instead a reference to the attachment will be provided. With a get operation on this reference the attachment can be received.
+
+e.g.
+
+Sample Query Response:
+
+{code}
+"Attachment Field":{
+	"Name":"20140127_Existing_Records.xlsx",
+	"URL":"http://localhost:8080/arapi/muc-vip-srvw084.intern.manyos.de/ARAPI:test/getAttachment/000000000000101/536870915"
+}
+{code}
+
+The attachment can be received via a GET operation at the following URL:
+
+{code}http://localhost:8080/arapi/muc-vip-srvw084.intern.manyos.de/ARAPI:test/getAttachment/000000000000101/536870915{code} 
+
+h4. Count results only
+
+A optional parameter countOnly is available to only return the number of records found by a query. Possible values are true, false. Default value is false.
+
+Sample Response:
+{code}
+{
+  "form": "BMC.CORE:BMC_BaseElement",
+  "query": "'DatasetId' = \"BMC.ASSET\" AND 'ClassId' != \"BMC_BUSINESSSERVICE\" AND 'AssetLifecycleStatus' = \"Deployed\"AND'ClassId'!=\"BMC_PERSON\"",
+  "resultSize": 20602
+}
+{code}
+
+h3. Get all Forms
+
+Returns all forms on the Server as JSON
+
+Request Format
+
+{code}http://<tomcat>/arapi/<arserver>{code}
+
+e.g.
+
+{code}http://tomcat/arapi/arserver/{code}
+
+Sample Response:
+
+{code}
+[
+	"AAS:Activity",
+	"AAS:ActivityInterface",
+	"AAS:ActivityInterface_Create",
+	"AAS:ActivityTaskJoin",
+	"AAS:AuditFilters",
+	"AAS:AuditLog",
+	"AAS:AuditLogSystem",
+	"AAS:CFG Notification Rules",
+	"AAS:CFG Rules",
+	...
+]
+{code}
+
+h3. Get all fields from a form
+
+Returns all fields with fieldid and fieldname from the Form as JSON
+
+Request Format
+
+{code}http://<tomcat>/arapi/<arserver>/<schema>{code}
+
+e.g.
+
+{code}http://tomcat/arapi/arserver/ARAPI:test{code}
+
+Sample Response:
+
+{code}
+{
+   "1":{
+      "fieldId":1,
+      "name":"Request-ID",
+      "type":"CharacterField",
+      "valueMapping":null
+   },
+   "2":{
+      "fieldId":2,
+      "name":"Submitter",
+      "type":"CharacterField",
+      "valueMapping":null
+   },
+   "3":{
+      "fieldId":3,
+      "name":"Create Date",
+      "type":"DateTimeField",
+      "valueMapping":null
+   },
+   "4":{
+      "fieldId":4,
+      "name":"Zugewiesen an",
+      "type":"CharacterField",
+      "valueMapping":null
+   },
+   "5":{
+      "fieldId":5,
+      "name":"Last modified by",
+      "type":"CharacterField",
+      "valueMapping":null
+   },
+   "6":{
+      "fieldId":6,
+      "name":"Modified Date",
+      "type":"DateTimeField",
+      "valueMapping":null
+   },
+   "7":{
+      "fieldId":7,
+      "name":"Status",
+      "type":"SelectionField",
+      "valueMapping":{
+         "0":"Neu",
+         "1":"Zugewiesen",
+         "2":"Behoben",
+         "3":"Zurueckgewiesen",
+         "4":"Abgeschlossen"
+      }
+   },
+   "8":{
+      "fieldId":8,
+      "name":"Short Description",
+      "type":"CharacterField",
+      "valueMapping":null
+   },
+   "15":{
+      "fieldId":15,
+      "name":"Statusverlauf",
+      "type":"CharacterField",
+      "valueMapping":null
+   },
+   "536870913":{
+      "fieldId":536870913,
+      "name":"Integer Field",
+      "type":"IntegerField",
+      "valueMapping":null
+   },
+   "536870914":{
+      "fieldId":536870914,
+      "name":"Attachment Pool",
+      "type":"AttachmentPoolField",
+      "valueMapping":null
+   },
+   "536870915":{
+      "fieldId":536870915,
+      "name":"Attachment Field",
+      "type":"AttachmentField",
+      "valueMapping":null
+   },
+   "536870916":{
+      "fieldId":536870916,
+      "name":"Selection Field",
+      "type":"SelectionField",
+      "valueMapping":{
+         "0":"Default 1",
+         "100":"value"
+      }
+   },
+   "536870917":{
+      "fieldId":536870917,
+      "name":"Diary Field",
+      "type":"DiaryField",
+      "valueMapping":null
+   },
+   "536870919":{
+      "fieldId":536870919,
+      "name":"Date Field",
+      "type":"DateOnlyField",
+      "valueMapping":null
+   },
+   "536870920":{
+      "fieldId":536870920,
+      "name":"Time Field",
+      "type":"TimeOnlyField",
+      "valueMapping":null
+   },
+   "536870921":{
+      "fieldId":536870921,
+      "name":"Currency Field",
+      "type":"CurrencyField",
+      "valueMapping":null
+   },
+   "536870922":{
+      "fieldId":536870922,
+      "name":"Real Field",
+      "type":"RealField",
+      "valueMapping":null
+   },
+   "536870923":{
+      "fieldId":536870923,
+      "name":"Decimal Field",
+      "type":"DecimalField",
+      "valueMapping":null
+   },
+   "536870924":{
+      "fieldId":536870924,
+      "name":"Date/time Fiel",
+      "type":"DateTimeField",
+      "valueMapping":null
+   },
+   "536870925":{
+      "fieldId":536870925,
+      "name":"Character Field",
+      "type":"CharacterField",
+      "valueMapping":null
+   }
+}
+{code}
+
+h3. Get Server Status
+
+Shows some basic server and license information
+
+Request Format:
+
+{code}http://<tomcat>/arapi/<arserver>/status{code} 
+
+Sample Response:
+
+{code}
+{
+  "Date": "2016-04-27T08:38:59Z",
+  "ServerInfo": {
+    "Name": "192.168.0.39",
+    "Port": 32771,
+    "Version": "9.1.00 201512160229",
+    "CharSet": "UTF-8",
+    "HostID": null
+  },
+  "CurrentLicenses": {
+    "AR Server": {
+      "fixed": 2
+    },
+    "BMC:Asset Mgmt": {
+      "fixed": 1
+    },
+    "BMC:Financial Mgmt": {
+      "fixed": 1
+    },
+    "BMC:Incident Mgmt": {
+      "fixed": 1
+    },
+    "BMC:Change Mgmt": {
+      "fixed": 1
+    },
+    "BMC:Problem Mgmt": {
+      "fixed": 1
+    },
+    "BMC:Service Level Mgmt": {
+      "fixed": 1
+    }
+  }
+}
+{code} 
+
+h3. Query Data
+
+To access data you need to provide a URL in the following format: 
+
+Request Format:
+
+{code}http://<tomcat>/arapi/<arserver>/<schema>/<query>{code} 
+
+e.g.
+
+{code}http://tomcat/arapi/arserver/ARAPI:test/'1' LIKE "00000000000010%"{code}
+
+Sample Response:
+
+{code}
+{
+	"000000000000101":{
+		"Attachment Field":{
+			"Name":"20140127_Existing_Records.xlsx",
+			"URL":"http://localhost:8080/arapi/muc-vip-srvw084.intern.manyos.de/ARAPI:test/getAttachment/000000000000101/536870915"
+		},
+		"Character Field":"roha",
+		"Create Date":"Tue Apr 01 09:00:16 CEST 2014",
+		"Currency Field":null,
+		"Date Field":"01.06.2014",
+		"Date/time Fiel":"Sun Jun 01 01:56:02 CEST 2014",
+		"Decimal Field":197,
+		"Diary Field":[
+			{
+			"createDate":"Tue Apr 01 09:00:16 CEST 2014",
+			"text":"New Entry",
+			"user":"rhannemann"
+			}
+		],
+		"Integer Field":9,
+		"Short Description":"New Shorty",
+		"Real Field":63332.556,
+		"Request-ID":"000000000000101",
+		"Selection Field":null,
+		"Status":"Behoben",
+		"Statusverlauf":"1396335616\u0004rhannemann\u0003\u00031396335616\u0004rhannemann\u0003",
+		"Submitter":"roha",
+		"Time Field":"19:00:00",
+		"Zugewiesen an":null,
+		"Last modified by":"rhannemann",
+		"Modified Date":"Tue Apr 01 16:49:14 CEST 2014"
+	}, "000000000000109":{
+		"Attachment Field":null,
+		"Character Field":"rohase",
+		"Create Date":"Tue Apr 01 15:10:56 CEST 2014",
+		"Currency Field":{
+			"conversionDate":"Tue Apr 01 11:10:35 CEST 2014",
+			"currencyCode":"USD",
+			"value":5299.84
+		},
+		"Date Field":"01.06.2014",
+		"Date/time Fiel":"Mon Jun 02 01:56:02 CEST 2014",
+		"Decimal Field":197,
+		"Diary Field":[
+			{
+				"createDate":"Tue Apr 01 15:10:56 CEST 2014",
+				"text":"New Entry",
+				"user":"rhannemann"
+			}
+			],
+		"Integer Field":9,
+		"Short Description":"New Update",
+		"Real Field":63332.556,
+		"Request-ID":"000000000000109",
+		"Selection Field":null,
+		"Status":"Behoben",
+		"Statusverlauf":"1396357856\u0004rhannemann\u0003\u00031396357856\u0004rhannemann\u0003",
+		"Submitter":"roha",
+		"Time Field":"19:00:00",
+		"Zugewiesen an":null,
+		"Last modified by":"rhannemann",
+		"Modified Date":"Tue Apr 01 15:10:56 CEST 2014"
+	}
+}
+{code}

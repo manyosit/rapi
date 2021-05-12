@@ -1,0 +1,55 @@
+The following Python code queries the CMDB AST:ComputerSystem with the query: 'Name' LIKE "%.manyos.de" AND 'Data Set Id' = "BMC.ASSET". For each CI the name an the Reconciliation ID are printed. Each CI will be checked for Dependency Relation. For each relation ClassID of the relation and the ClassID of the Destination Class are printed. 
+The Sample contains also the necessary methods for user authentication and illustrates how easy it is to access data via the API. 
+
+{code}
+ import json
+ from pprint import pprint
+ import urllib2
+ 
+ def printme(str_name, str_reconid ):
+    "This prints a passed string into this function"
+    print str_name + " " + str_reconid
+    getRelations(str_reconid)
+    return
+ 
+ def getRelations(str_reconid):
+     json_data = urllib2.urlopen("http://tomcat/arapi/arserver/BMC.CORE:BMC_Dependency/'Source.ReconciliationIdentity'=%22" + str_reconid + "%22")
+     mydata = json.load(json_data)
+     #pprint (mydata)
+     for myRelation in mydata:
+         print(mydata[myRelation]["ClassId"] + " -> " + mydata[myRelation]["Destination.ClassId"])
+     return
+ 
+ username = "Demo"
+ password = "12345"
+ 
+ # create a password manager
+ password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+ 
+ # Add the username and password.
+ # If we knew the realm, we could use it instead of None.
+ top_level_url = "http://muc-vip-srvw084.intern.manyos.de:8080/arapi"
+ password_mgr.add_password('myRealm', top_level_url, username, password)
+ 
+ handler = urllib2.HTTPBasicAuthHandler(password_mgr)
+ 
+ # create "opener" (OpenerDirector instance)
+ opener = urllib2.build_opener(handler)
+ 
+ # use the opener to fetch a URL
+ opener.open(top_level_url)
+ 
+ # Install the opener.
+ # Now all calls to urllib2.urlopen use our opener.
+ urllib2.install_opener(opener)
+ 
+ # use the opener to fetch a URL
+ json_data = urllib2.urlopen("http://tomcat" + urllib2.quote("/arapi/arserver/AST:ComputerSystem/'Name' LIKE \Ò%.vipcon.com\Ò AND 'Data Set Id' = \"BMC.ASSET\""))
+ 
+ data = json.load(json_data)
+ 
+ for o in data:
+ 	printme(data[o]["Name"], data[o]["Reconciliation Identity"])
+ 
+ json_data.close()
+ {code}

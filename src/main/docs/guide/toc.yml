@@ -1,0 +1,14 @@
+introduction:
+  title: Introduction
+  changes: Change Log
+gettingStarted: Getting Started
+operations:
+  title: API Operations
+  general: General Options
+  GET: Query Data
+  POST: Create Data
+  PUT: Update Data
+  DELETE: Delete Data
+sampleapps:
+  title: Sample Applications
+  python: Python CMDB Access
