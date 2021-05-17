@@ -28,6 +28,8 @@ WORKDIR /app
 # Copy App files
 COPY --chown=appuser . /app
 
+RUN CHMOD -R 755 /app
+
 # Run Grails dependency-report command to pre-download dependencies but not
 # create unnecessary build files or artifacts.
 RUN grails dependency-report
