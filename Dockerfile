@@ -26,7 +26,7 @@ USER appuser
 WORKDIR /app
 
 # Copy App files
-COPY --chown=appuser . /app
+COPY --chown=appuser:appuser . /app
 
 RUN chmod -R 755 /app
 
