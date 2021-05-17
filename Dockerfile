@@ -1,7 +1,9 @@
-FROM java:8
+FROM openjdk:8-jdk-alpine
 MAINTAINER Robert Hannemann
 
 ENV GRAILS_VERSION 4.0.10
+
+RUN apk add --no-cache wget unzip
 
 # Install Grails
 WORKDIR /usr/lib/jvm
@@ -13,27 +15,23 @@ RUN wget https://github.com/grails/grails-core/releases/download/v$GRAILS_VERSIO
 ENV GRAILS_HOME /usr/lib/jvm/grails
 ENV PATH $GRAILS_HOME/bin:$PATH
 
-RUN groupadd -g 999 appuser && \
-    useradd -r -m -u 999 -g appuser appuser
+RUN addgroup -S appgroup -g 900 && adduser -S appuser -u 900 -G appgroup
 
 # Create App Directory
 RUN mkdir /app
-RUN chown -R 999:999 /app
+RUN chown -R appuser:appgroup /app
 
 USER appuser
-
 # Set Workdir
 WORKDIR /app
 
 # Copy App files
-COPY --chown=appuser:appuser . /app
+COPY --chown=appuser:appgroup . /app
 
 # Run Grails dependency-report command to pre-download dependencies but not
 # create unnecessary build files or artifacts.
 RUN grails dependency-report
-#RUN grails package
 RUN grails war
-#RUN chmod -R 775 /app
 
 # Set Default Behavior
 ENTRYPOINT ["java"]
