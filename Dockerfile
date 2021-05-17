@@ -32,11 +32,12 @@ COPY --chown=appuser:appuser . /app
 # create unnecessary build files or artifacts.
 RUN grails dependency-report
 RUN grails package
+RUN grails war
 RUN chmod -R 775 /app
 
 # Set Default Behavior
-ENTRYPOINT ["grails"]
+ENTRYPOINT ["java"]
 
 EXPOSE 8080
 
-CMD ["prod", "run-app"]
+CMD ["-Dgrails.env=prod", "-jar", "build/libs/app-2.1.war"]
