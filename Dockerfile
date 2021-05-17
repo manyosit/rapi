@@ -28,11 +28,11 @@ WORKDIR /app
 # Copy App files
 COPY --chown=appuser:appuser . /app
 
-RUN chmod -R 775 /app
 # Run Grails dependency-report command to pre-download dependencies but not
 # create unnecessary build files or artifacts.
 RUN grails dependency-report
 RUN grails package
+RUN chmod -R 775 /app
 
 # Set Default Behavior
 ENTRYPOINT ["grails"]
