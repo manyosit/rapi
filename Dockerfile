@@ -21,6 +21,7 @@ RUN addgroup -S appgroup -g 900 && adduser -S appuser -u 900 -G appgroup
 RUN mkdir /app
 RUN chown -R appuser:appgroup /app
 
+
 USER appuser
 # Set Workdir
 WORKDIR /app
