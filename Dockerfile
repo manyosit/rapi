@@ -39,4 +39,4 @@ ENTRYPOINT ["java"]
 
 EXPOSE 8080
 
-CMD ["-Dgrails.env=prod", "-jar", "build/libs/app-2.1.war"]
+CMD ["-Dgrails.env=prod", "-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true", "-jar", "build/libs/app-2.1.war"]
