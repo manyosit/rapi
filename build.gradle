@@ -10,7 +10,7 @@ buildscript {
     }
 }
 
-version "0.1"
+version "22"
 group "test"
 
 apply plugin:"eclipse"
