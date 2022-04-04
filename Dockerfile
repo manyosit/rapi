@@ -1,7 +1,7 @@
 FROM openjdk:8-jdk-alpine
 MAINTAINER Robert Hannemann
 
-ENV GRAILS_VERSION 5.1.0
+ENV GRAILS_VERSION 5.1.6
 
 RUN apk add --no-cache wget unzip
 
