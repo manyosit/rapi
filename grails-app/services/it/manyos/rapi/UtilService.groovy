@@ -55,7 +55,11 @@ class UtilService {
 			def myValue = new CurrencyValue()
 			myValue.setValue(JSONValue.value)
 			myValue.setCurrencyCode(JSONValue.currencyCode)
-			myValue.setConversionDate((long) (parseDate(JSONValue.conversionDate).getTime() / 1000))
+			if (JSONValue.conversionDate) {
+				myValue.setConversionDate((long) (parseDate(JSONValue.conversionDate).getTime() / 1000))
+			} else {
+				myValue.setConversionDate((long) (new Date().getTime() / 1000))
+			}
 			value = new Value(myValue)
 		} else
 			value = new Value(JSONValue)
