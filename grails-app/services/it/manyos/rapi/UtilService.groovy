@@ -79,7 +79,7 @@ class UtilService {
 
 		for (SimpleDateFormat pattern : knownPatterns) {
 			try {
-				log.debug(dateString + ' pattern: ' + pattern.toPattern())
+				log.debug('try to map date: ' + dateString + ' pattern: ' + pattern.toPattern())
 				// Take a try
 				return new Date(pattern.parse(dateString).getTime());
 			} catch (ParseException pe) {

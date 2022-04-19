@@ -260,6 +260,7 @@ class RemedyService {
         def records = context.getListEntryObjects(schema, qual, firstEntry, maxEntries, sortInfoList, fieldIds as int[] , false, null)
 
         records.each { record ->
+            def sdf = new SimpleDateFormat(dateFormat)
             def recordData = [:]
             //for (EntryListInfo eListInfo : eListInfos) {
             //Entry record = ${it} //context.getEntry(schema,eListInfo.getEntryID(), null);
@@ -287,14 +288,15 @@ class RemedyService {
                 } else if (myField.getType().equals("DateTimeField") && record.get(i).getValue().getClass().getSimpleName().toString().equals("Timestamp")) {
                     //Handle TimeStamp
                     //recordValue = record.get(i).getValue().toDate().toString()
-                    def sdf = new SimpleDateFormat(dateFormat)
                     recordValue = sdf.format(record.get(i).getValue().toDate());
                 } else if (record.get(i).getValue() != null && record.get(i).getValue().getClass().getSimpleName().toString().equals("DiaryListValue")) {
                     def diaryValues = new ArrayList()
                     record.get(i).getValue().each { diaryItem ->
-                        def myDiaryItem = new SimpleDiaryItem(createDate:diaryItem.getTimestamp().toDate().toString(),
+                        def myDiaryItem = new SimpleDiaryItem(
+                                createDate:sdf.format(diaryItem.getTimestamp().toDate()),
                                 text:diaryItem.getText(),
-                                user:diaryItem.getUser())
+                                user:diaryItem.getUser()
+                        )
                         diaryValues.add(myDiaryItem)
                     }
                     recordValue = diaryValues
@@ -307,9 +309,11 @@ class RemedyService {
                         recordValue = UtilService.convertStatusHistoryValue(record.get(i).getValue().toString(), new ArrayList(formFields.get(7).valueMapping.keySet()))
                 }
                 else if (record.get(i).getValue() != null && record.get(i).getValue().getClass().getSimpleName().toString().equals("CurrencyValue")) {
-                    recordValue = new SimpleCurrencyValue(conversionDate:record.get(i).getValue().getConversionDate().toDate().toString(),
+                    recordValue = new SimpleCurrencyValue(
+                            conversionDate:sdf.format(record.get(i).getValue().getConversionDate().toDate()),
                             value:record.get(i).getValue().getValue(),
-                            currencyCode:record.get(i).getValue().getCurrencyCode())
+                            currencyCode:record.get(i).getValue().getCurrencyCode()
+                    )
                 } else if (myField.getType().equals("DecimalField") || myField.getType().equals("IntegerField") || myField.getType().equals("RealField")) {
                     recordValue = record.get(i).getValue()
                 } else if (myField.getType().equals("AttachmentField")) {
