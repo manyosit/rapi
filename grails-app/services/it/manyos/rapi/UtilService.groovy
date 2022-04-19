@@ -55,7 +55,7 @@ class UtilService {
 			def myValue = new CurrencyValue()
 			myValue.setValue(JSONValue.value)
 			myValue.setCurrencyCode(JSONValue.currencyCode)
-			myValue.setConversionDate((long)parseDate(JSONValue.conversionDate).getTime() / 1000)
+			myValue.setConversionDate((long) (parseDate(JSONValue.conversionDate).getTime() / 1000))
 			value = new Value(myValue)
 		} else
 			value = new Value(JSONValue)
@@ -79,6 +79,7 @@ class UtilService {
 
 		for (SimpleDateFormat pattern : knownPatterns) {
 			try {
+				log.debug(dateString + ' pattern: ' + pattern.toPattern())
 				// Take a try
 				return new Date(pattern.parse(dateString).getTime());
 			} catch (ParseException pe) {
