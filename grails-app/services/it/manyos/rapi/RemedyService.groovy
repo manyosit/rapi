@@ -431,7 +431,7 @@ class RemedyService {
         def values = entryObject['values']
         //loadfieldlist
         def myEntry = null
-        log.error("Entries: " + recordId + ": " + values)
+        log.debug("Entries: " + recordId + ": " + values)
         def fieldCache = getFields(context, schema)
         def returnValue = [:]
 
