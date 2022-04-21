@@ -505,4 +505,12 @@ class RemedyService {
         allEntries.put(entryId, "success")
         return allEntries
     }
+
+    def setRpcQueue(context, params) {
+        if (params && params.rpcQueue) {
+            int rpcQueue = Integer.parseInt(params.rpcQueue)
+            log.debug('Use RPC Queue', rpcQueue)
+            context.usePrivateRpcQueue(rpcQueue)
+        }
+    }
 }

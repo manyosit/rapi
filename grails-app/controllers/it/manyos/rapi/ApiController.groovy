@@ -41,6 +41,7 @@ class ApiController {
             } else {
                 context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
             }
+            remedyService.setRpcQueue(context, params)
             //context = remedyService.getARContext("server", 0.intValue(), "a", "v")
             //def records
             //Set parameter
@@ -170,6 +171,7 @@ class ApiController {
             } else {
                 context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
             }
+            remedyService.setRpcQueue(context, params)
             def returnValue
             //checke form
             if (params.form == null || params.form.equals(""))
@@ -214,6 +216,7 @@ class ApiController {
             } else {
                 context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
             }
+            remedyService.setRpcQueue(context, params)
             def records
             //Return Error if no query given
             if (params.form == null || params.form == '') {
@@ -264,6 +267,7 @@ class ApiController {
             } else {
                 context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
             }
+            remedyService.setRpcQueue(context, params)
             def returnValue
             //checke form
             if (params.form == null || params.form.equals(""))
@@ -300,6 +304,7 @@ class ApiController {
             } else {
                 context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
             }
+            remedyService.setRpcQueue(context, params)
             int[] fieldIds = [Integer.parseInt(params.fieldId)]
             def myEntry = context.getEntry(params.form, params.entryId, fieldIds)
             //log.debug myEntry
@@ -334,6 +339,7 @@ class ApiController {
             } else {
                 context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
             }
+            remedyService.setRpcQueue(context, params)
             if (request instanceof MultipartHttpServletRequest){
                 //log.debug request.getFileNames().toString()
                 //Get the file's name from request
