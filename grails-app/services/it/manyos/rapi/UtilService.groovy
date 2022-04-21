@@ -50,17 +50,25 @@ class UtilService {
 		log.debug "Field: " + fieldType + " " + JSONValue*/
 		
 		if (fieldType.equals("DateTimeField")) {
-			value = new Value(parseDate(JSONValue).getTime() / 1000)
-		} else if (fieldType.equals("CurrencyField")) {
-			def myValue = new CurrencyValue()
-			myValue.setValue(JSONValue.value)
-			myValue.setCurrencyCode(JSONValue.currencyCode)
-			if (JSONValue.conversionDate) {
-				myValue.setConversionDate((long) (parseDate(JSONValue.conversionDate).getTime() / 1000))
+			if (JSONValue == null) {
+				value = new Value(null)
 			} else {
-				myValue.setConversionDate((long) (new Date().getTime() / 1000))
+				value = new Value(parseDate(JSONValue).getTime() / 1000)
 			}
-			value = new Value(myValue)
+		} else if (fieldType.equals("CurrencyField")) {
+			if (JSONValue == null) {
+				value = new Value(null)
+			} else {
+				def myValue = new CurrencyValue()
+				myValue.setValue(JSONValue.value)
+				myValue.setCurrencyCode(JSONValue.currencyCode)
+				if (JSONValue.conversionDate) {
+					myValue.setConversionDate((long) (parseDate(JSONValue.conversionDate).getTime() / 1000))
+				} else {
+					myValue.setConversionDate((long) (new Date().getTime() / 1000))
+				}
+				value = new Value(myValue)
+			}
 		} else
 			value = new Value(JSONValue)
 			
