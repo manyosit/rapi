@@ -10,7 +10,7 @@ class UrlMappings {
         }*/
 
         "/$server/$form?/$query**?"(controller:"api") {
-            action = [GET: "get", PUT: "put", DELETE: "delete", POST: "post"]
+            action = [GET: "get", PUT: "put", DELETE: "delete", POST: "post", PATCH: "patch"]
         }
 
         "/$server/$form/getAttachment/$entryId/$fieldId"(controller:"api") {

@@ -425,7 +425,7 @@ class RemedyService {
      * @param entryObjects The JSON Objects to update
      * @return returns a TreeMap with all entry ids and any errors
      */
-    def updateEntries(ARServerUser context, String schema, entryObject) {
+    def updateEntries(ARServerUser context, String schema, entryObject, mergeOptions) {
         log.debug("Entries: " + entryObject.size())
         def recordId = entryObject['id']
         def values = entryObject['values']
@@ -441,27 +441,17 @@ class RemedyService {
         myEntry = UtilService.setEntry(myEntry, values, fieldCache)
         //Save entry
         log.debug("Entries set: " + myEntry)
-        context.setEntry(schema, recordId, myEntry, new Timestamp(), 0)
+        if (mergeOptions) {
+            context.mergeEntry(schema, myEntry, mergeOptions)
+            log.error("Use mergeEntry with " + mergeOptions)
+        } else {
+            log.error("Use setEntry")
+            context.setEntry(schema, recordId, myEntry, new Timestamp(), 0)
+        }
         returnValue['message'] = 'success'
         returnValue['entry'] = myEntry
         log.debug("Entries: " + myEntry)
 
-        /*def allEntries = new TreeMap();
-        entryObject.keySet().each {
-            try {
-                int[] fields = [1,2]
-                def myEntry = context.getEntry(schema, it, fields)
-                myEntry = UtilService.setEntry(myEntry, entryObject.get(it), fieldCache)
-                //Save entry
-                context.setEntry(schema, it, myEntry, new Timestamp(), 0)
-                allEntries.put(it, "success")
-            } catch (Exception updateException) {
-                //updateException.printStackTrace()
-                log.error "API Service: " + updateException
-                allEntries.put(it, updateException.toString())
-            }
-        }*/
-        //return myEntry
         return returnValue
     }
 

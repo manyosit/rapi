@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 
 class ApiController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE", getNewFieldID: "GET", licenseCount:"GET", environments:"GET", activeQuery:"GET"]
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE", patch: "PATCH", getNewFieldID: "GET", licenseCount:"GET", environments:"GET", activeQuery:"GET"]
 
     def remedyService
 
@@ -182,10 +182,56 @@ class ApiController {
                 /*request.XML.entry.entry.Strasse__c.each {
                     log.debug it
                 }*/
-                returnValue = remedyService.updateEntries(context, params.form, request.XML)
+                returnValue = remedyService.updateEntries(context, params.form, request.XML, null)
                 render(status: 200, text: returnValue) as XML
             } else {
-                returnValue = remedyService.updateEntries(context, params.form, request.JSON)
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, null)
+                render(status: 200, text: returnValue) as JSON
+                //render returnValue as JSON
+            }
+        } catch (Exception e) {
+            if (params.format && params.format.equalsIgnoreCase("XML")) {
+                render(status: 500, text: e.getMessage()) as XML
+            } else {
+                render(status: 500, text: e.getMessage()) as JSON
+            }
+            log.error(e.getMessage())
+        } finally {
+            context.logout()
+        }
+    }
+
+    //Put = Update
+    def patch() {
+        log.debug("Params: " + params)
+        def format = "JSON"
+        def impersonateUser = null
+        def mergeOptions = 4
+        ARServerUser context = new ARServerUser();
+        try {
+            if (params.impersonateUser ) {
+                impersonateUser = params.impersonateUser
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0, impersonateUser)
+            } else {
+                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
+            }
+            remedyService.setRpcQueue(context, params)
+            def returnValue
+            //checke form
+            if (params.form == null || params.form.equals(""))
+                render "Please provide a form"
+            if (params.mergeOptions != null)
+                mergeOptions = params.mergeOptions?.toInteger() ?: 4;
+            if (params.format && params.format.equalsIgnoreCase("XML")) {
+                format = "XML"
+                //create Entries
+                /*request.XML.entry.entry.Strasse__c.each {
+                    log.debug it
+                }*/
+                returnValue = remedyService.updateEntries(context, params.form, request.XML, mergeOptions)
+                render(status: 200, text: returnValue) as XML
+            } else {
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, mergeOptions)
                 render(status: 200, text: returnValue) as JSON
                 //render returnValue as JSON
             }

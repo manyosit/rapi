@@ -7,7 +7,7 @@ class ApiInterceptor {
         def origin = request.getHeader("Origin");
         header( "Access-Control-Allow-Origin", origin )
         header( "Access-Control-Allow-Credentials", "true" )
-        header( "Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE" )
+        header( "Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH, PUT" )
         header( "Access-Control-Max-Age", "3600" )
         true
     }
