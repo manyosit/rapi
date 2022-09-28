@@ -443,9 +443,9 @@ class RemedyService {
         log.debug("Entries set: " + myEntry)
         if (mergeOptions) {
             context.mergeEntry(schema, myEntry, mergeOptions)
-            log.error("Use mergeEntry with " + mergeOptions)
+            log.debug("Use mergeEntry with " + mergeOptions)
         } else {
-            log.error("Use setEntry")
+            log.debug("Use setEntry")
             context.setEntry(schema, recordId, myEntry, new Timestamp(), 0)
         }
         returnValue['message'] = 'success'
