@@ -425,7 +425,7 @@ class RemedyService {
      * @param entryObjects The JSON Objects to update
      * @return returns a TreeMap with all entry ids and any errors
      */
-    def updateEntries(ARServerUser context, String schema, entryObject, mergeOptions) {
+    def updateEntries(ARServerUser context, String schema, entryObject, mergeOptions, mergeQuery) {
         log.debug("Entries: " + entryObject.size())
         def recordId = entryObject['id']
         def values = entryObject['values']
@@ -434,7 +434,7 @@ class RemedyService {
         log.debug("Entries: " + recordId + ": " + values)
         def fieldCache = getFields(context, schema)
         def returnValue = [:]
-
+        context.mergeEntry()
         int[] fields = [1,2]
         myEntry = context.getEntry(schema, recordId, fields)
         log.debug("Entries: " + myEntry)
@@ -442,7 +442,12 @@ class RemedyService {
         //Save entry
         log.debug("Entries set: " + myEntry)
         if (mergeOptions) {
-            context.mergeEntry(schema, myEntry, mergeOptions)
+            if (mergeQuery) {
+                QualifierInfo qual = context.parseQualification(schema, mergeQuery);
+                context.mergeEntry(schema, myEntry, mergeOptions, mergeQuery, qual, 2)
+            } else {
+                context.mergeEntry(schema, myEntry, mergeOptions)
+            }
             log.debug("Use mergeEntry with " + mergeOptions)
         } else {
             log.debug("Use setEntry")

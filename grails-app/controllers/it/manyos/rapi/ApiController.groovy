@@ -182,10 +182,10 @@ class ApiController {
                 /*request.XML.entry.entry.Strasse__c.each {
                     log.debug it
                 }*/
-                returnValue = remedyService.updateEntries(context, params.form, request.XML, null)
+                returnValue = remedyService.updateEntries(context, params.form, request.XML, null, null)
                 render(status: 200, text: returnValue) as XML
             } else {
-                returnValue = remedyService.updateEntries(context, params.form, request.JSON, null)
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, null, null)
                 render(status: 200, text: returnValue) as JSON
                 //render returnValue as JSON
             }
@@ -207,6 +207,7 @@ class ApiController {
         def format = "JSON"
         def impersonateUser = null
         def mergeOptions = 4
+        def mergeQuery = null
         ARServerUser context = new ARServerUser();
         try {
             if (params.impersonateUser ) {
@@ -222,16 +223,18 @@ class ApiController {
                 render "Please provide a form"
             if (params.mergeOptions != null)
                 mergeOptions = params.mergeOptions?.toInteger() ?: 4;
+            if (params.mergeQuery != null)
+                mergeQuery = params.mergeQuery;
             if (params.format && params.format.equalsIgnoreCase("XML")) {
                 format = "XML"
                 //create Entries
                 /*request.XML.entry.entry.Strasse__c.each {
                     log.debug it
                 }*/
-                returnValue = remedyService.updateEntries(context, params.form, request.XML, mergeOptions)
+                returnValue = remedyService.updateEntries(context, params.form, request.XML, mergeOptions, mergeQuery)
                 render(status: 200, text: returnValue) as XML
             } else {
-                returnValue = remedyService.updateEntries(context, params.form, request.JSON, mergeOptions)
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, mergeOptions, mergeQuery)
                 render(status: 200, text: returnValue) as JSON
                 //render returnValue as JSON
             }
