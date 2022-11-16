@@ -425,39 +425,99 @@ class RemedyService {
      * @param entryObjects The JSON Objects to update
      * @return returns a TreeMap with all entry ids and any errors
      */
-    def updateEntries(ARServerUser context, String schema, entryObject, mergeOptions, mergeQuery) {
-        log.debug("Entries: " + entryObject.size())
+    def updateEntries(ARServerUser context, String schema, entryObject, boolean useMerge) {
+        int multiMatchOption = 2;
         def recordId = entryObject['id']
         def values = entryObject['values']
-        //loadfieldlist
-        def myEntry = null
-        log.debug("Entries: " + recordId + ": " + values)
-        def fieldCache = getFields(context, schema)
-        def returnValue = [:]
-        context.mergeEntry()
-        int[] fields = [1,2]
-        myEntry = context.getEntry(schema, recordId, fields)
-        log.debug("Entries: " + myEntry)
-        myEntry = UtilService.setEntry(myEntry, values, fieldCache)
-        //Save entry
-        log.debug("Entries set: " + myEntry)
-        if (mergeOptions) {
-            if (mergeQuery) {
-                QualifierInfo qual = context.parseQualification(schema, mergeQuery);
-                context.mergeEntry(schema, myEntry, mergeOptions, mergeQuery, qual, 2)
-            } else {
-                context.mergeEntry(schema, myEntry, mergeOptions)
-            }
-            log.debug("Use mergeEntry with " + mergeOptions)
-        } else {
-            log.debug("Use setEntry")
-            context.setEntry(schema, recordId, myEntry, new Timestamp(), 0)
-        }
-        returnValue['message'] = 'success'
-        returnValue['entry'] = myEntry
-        log.debug("Entries: " + myEntry)
+        def query = entryObject['query']
+        int mergeOptions = entryObject['mergeOptions']?.toInteger() ?: 1028;
+        log.debug("mergeOp: "+ mergeOptions)
 
-        return returnValue
+        def returnValue = [:]
+        if (entryObject['multiMatchOption'] != null) {
+            try {
+                multiMatchOption = entryObject['multiMatchOption'];
+                if (multiMatchOption < 0 || multiMatchOption > 2) {
+                    log.error('MultimatchOption: ' + multiMatchOption + ' not valid. Fallback to 2');
+                    multiMatchOption = 2;
+                }
+            } catch (e) {
+                log.error("Can't covert MultiMatchOption to int", e);
+            }
+        }
+        //loadfieldlist
+        def myEntries = []
+        int[] fields = [1,2]
+        if (query != null) {
+            QualifierInfo qual = context.parseQualification(schema, query);
+            def sortInfoList = new ArrayList();
+            myEntries = context.getListEntryObjects(schema, qual, 0, 0, sortInfoList, fields , false, null)
+        } else {
+            def myEntry = context.getEntry(schema, recordId, fields)
+            myEntries.push(myEntry)
+        }
+
+        log.debug("Entries found for update: " + myEntries.size())
+
+        log.debug("MultimatchOption: " + multiMatchOption)
+        def fieldCache = getFields(context, schema)
+
+        def updateResults = [];
+
+        //handle MultiMatch
+        if (multiMatchOption == 0 && myEntries.size() > 1) {
+            def myResult = [:];
+            myResult['message'] = 'error';
+            myResult['details'] = '' + myEntries.size() + ' Entries found. Multiple Match error.'
+            updateResults.push(myResult)
+            return updateResults;
+        } else if (multiMatchOption == 1 && myEntries.size() > 1) {
+            //Take only first record
+            myEntries = [myEntries[0]];
+        }
+
+        myEntries.each {
+            def myEntry = it;
+            def myRecordId = it.get(1).getValue();
+
+            myEntry = UtilService.setEntry(myEntry, values, fieldCache)
+            try {
+                def entryResult = updateEntryInternal(context, schema, myEntry, myRecordId, mergeOptions, useMerge)
+                def myResult = [:];
+                myResult['message'] = 'success';
+                myResult['entry'] = myEntry
+                updateResults.push(myResult)
+            } catch (error) {
+                def myResult = [:];
+                myResult['message'] = 'error';
+                myResult['entry'] = myEntry
+                myResult['details'] = error
+                updateResults.push(myResult)
+            }
+        }
+        //Save entry
+
+        log.debug("Results: " + updateResults)
+
+        return updateResults
+    }
+
+    /**
+     * @param context The AR Server Context to use
+     * @param schema The AR Form Name
+     * @param myEntry The Entry to update
+     * @param recordId The id of the record
+     * @param mergeOptions
+     * @param useMerge
+     * @return returns a TreeMap with all entry ids and any errors
+     */
+    def updateEntryInternal(ARServerUser context, String schema, Entry myEntry, String recordId, mergeOptions, Boolean useMerge) {
+        if (useMerge == true) {
+            log.debug('Use merge for update.');
+            context.mergeEntry(schema, myEntry, mergeOptions);
+        } else {
+            context.setEntry(schema, recordId, myEntry, new Timestamp(), 0);
+        }
     }
 
     /**
