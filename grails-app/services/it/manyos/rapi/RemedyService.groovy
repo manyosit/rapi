@@ -260,85 +260,89 @@ class RemedyService {
         def records = context.getListEntryObjects(schema, qual, firstEntry, maxEntries, sortInfoList, fieldIds as int[] , false, null)
 
         records.each { record ->
-            def sdf = new SimpleDateFormat(dateFormat)
-            def recordData = [:]
-            //for (EntryListInfo eListInfo : eListInfos) {
-            //Entry record = ${it} //context.getEntry(schema,eListInfo.getEntryID(), null);
-            def myRecordValues = [:]
-            for (Integer i : record.keySet()) {
-                def myField
-                formFields.each {
-                    if (it.fieldId == i)
-                        myField = it
-                }
-
-                def recordValue = null
-                //Check for Valuemappings if Selection field
-
-                //log.debug(record.get(i).getValue().toString().toString())
-                //log.debug(record.get(i).getValue().getClass())
-                //log.debug(myField.getFieldId())
-                if (record.get(i).getValue() == null)
-                    recordValue = null
-                else if (myField.getType().equals("SelectionField")) {
-                    if (translateSelectionFields)
-                        recordValue = myField.valueMapping[Integer.parseInt(record.get(i).getValue().toString().toString())]
-                    else
-                        recordValue = record.get(i).getValue()
-                } else if (myField.getType().equals("DateTimeField") && record.get(i).getValue().getClass().getSimpleName().toString().equals("Timestamp")) {
-                    //Handle TimeStamp
-                    //recordValue = record.get(i).getValue().toDate().toString()
-                    recordValue = sdf.format(record.get(i).getValue().toDate());
-                } else if (record.get(i).getValue() != null && record.get(i).getValue().getClass().getSimpleName().toString().equals("DiaryListValue")) {
-                    def diaryValues = new ArrayList()
-                    record.get(i).getValue().each { diaryItem ->
-                        def myDiaryItem = new SimpleDiaryItem(
-                                createDate:sdf.format(diaryItem.getTimestamp().toDate()),
-                                text:diaryItem.getText(),
-                                user:diaryItem.getUser()
-                        )
-                        diaryValues.add(myDiaryItem)
-                    }
-                    recordValue = diaryValues
-                } else if (record.get(i).getValue() != null && myField.getFieldId() == 15) {
-                    //log.debug formFields.get(7).valueMapping.values()
-                    //log.debug formFields.get(7).valueMapping.keySet()
-                    if (translateSelectionFields)
-                        recordValue = UtilService.convertStatusHistoryValue(record.get(i).getValue().toString(), new ArrayList(formFields.get(7).valueMapping.values()))
-                    else
-                        recordValue = UtilService.convertStatusHistoryValue(record.get(i).getValue().toString(), new ArrayList(formFields.get(7).valueMapping.keySet()))
-                }
-                else if (record.get(i).getValue() != null && record.get(i).getValue().getClass().getSimpleName().toString().equals("CurrencyValue")) {
-                    recordValue = new SimpleCurrencyValue(
-                            conversionDate:sdf.format(record.get(i).getValue().getConversionDate().toDate()),
-                            value:record.get(i).getValue().getValue(),
-                            currencyCode:record.get(i).getValue().getCurrencyCode()
-                    )
-                } else if (myField.getType().equals("DecimalField") || myField.getType().equals("IntegerField") || myField.getType().equals("RealField")) {
-                    recordValue = record.get(i).getValue()
-                } else if (myField.getType().equals("AttachmentField")) {
-                    def attachment = record.get(i).getValue()
-                    def attachmentValue = new HashMap()
-                    attachmentValue["URL"] = grailsLinkGenerator.link([controller: 'home', absolute:true]) + "/" + context.getServer() +  "/" + schema +"/getAttachment/" + record.getEntryId() + "/${i}"
-                    attachmentValue["Name"] = attachment.getName()
-                    recordValue = attachmentValue
-                }
-                else
-                    recordValue = record.get(i).getValue().toString().toString()
-
-                if (returnFieldNames)
-                    myRecordValues[myField.name] = recordValue
-                else
-                    myRecordValues[i] = recordValue
-            }
-            recordData['id'] = record.get(1).toString()
-            recordData['values'] = myRecordValues
-            allRecords.add(recordData)
+            def recordData = convertRecord(record, formFields, dateFormat, translateSelectionFields, returnFieldNames);
+            allRecords.add(recordData);
         }
         log.debug "Query returned " + allRecords.size() + " records "
         return allRecords
     }
 
+    def convertRecord(record, formFields, dateFormat, translateSelectionFields, returnFieldNames) {
+        def sdf = new SimpleDateFormat(dateFormat)
+        def recordData = [:]
+        //for (EntryListInfo eListInfo : eListInfos) {
+        //Entry record = ${it} //context.getEntry(schema,eListInfo.getEntryID(), null);
+        def myRecordValues = [:]
+        for (Integer i : record.keySet()) {
+            def myField
+            formFields.each {
+                if (it.fieldId == i)
+                    myField = it
+            }
+
+            def recordValue = null
+            //Check for Valuemappings if Selection field
+
+            //log.debug(record.get(i).getValue().toString().toString())
+            //log.debug(record.get(i).getValue().getClass())
+            //log.debug(myField.getFieldId())
+            if (record.get(i).getValue() == null)
+                recordValue = null
+            else if (myField.getType().equals("SelectionField")) {
+                if (translateSelectionFields)
+                    recordValue = myField.valueMapping[Integer.parseInt(record.get(i).getValue().toString().toString())]
+                else
+                    recordValue = record.get(i).getValue()
+            } else if (myField.getType().equals("DateTimeField") && record.get(i).getValue().getClass().getSimpleName().toString().equals("Timestamp")) {
+                //Handle TimeStamp
+                //recordValue = record.get(i).getValue().toDate().toString()
+                recordValue = sdf.format(record.get(i).getValue().toDate());
+            } else if (record.get(i).getValue() != null && record.get(i).getValue().getClass().getSimpleName().toString().equals("DiaryListValue")) {
+                def diaryValues = new ArrayList()
+                record.get(i).getValue().each { diaryItem ->
+                    def myDiaryItem = new SimpleDiaryItem(
+                            createDate:sdf.format(diaryItem.getTimestamp().toDate()),
+                            text:diaryItem.getText(),
+                            user:diaryItem.getUser()
+                    )
+                    diaryValues.add(myDiaryItem)
+                }
+                recordValue = diaryValues
+            } else if (record.get(i).getValue() != null && myField.getFieldId() == 15) {
+                //log.debug formFields.get(7).valueMapping.values()
+                //log.debug formFields.get(7).valueMapping.keySet()
+                if (translateSelectionFields)
+                    recordValue = UtilService.convertStatusHistoryValue(record.get(i).getValue().toString(), new ArrayList(formFields.get(7).valueMapping.values()))
+                else
+                    recordValue = UtilService.convertStatusHistoryValue(record.get(i).getValue().toString(), new ArrayList(formFields.get(7).valueMapping.keySet()))
+            }
+            else if (record.get(i).getValue() != null && record.get(i).getValue().getClass().getSimpleName().toString().equals("CurrencyValue")) {
+                recordValue = new SimpleCurrencyValue(
+                        conversionDate:sdf.format(record.get(i).getValue().getConversionDate().toDate()),
+                        value:record.get(i).getValue().getValue(),
+                        currencyCode:record.get(i).getValue().getCurrencyCode()
+                )
+            } else if (myField.getType().equals("DecimalField") || myField.getType().equals("IntegerField") || myField.getType().equals("RealField")) {
+                recordValue = record.get(i).getValue()
+            } else if (myField.getType().equals("AttachmentField")) {
+                def attachment = record.get(i).getValue()
+                def attachmentValue = new HashMap()
+                attachmentValue["URL"] = grailsLinkGenerator.link([controller: 'home', absolute:true]) + "/" + context.getServer() +  "/" + schema +"/getAttachment/" + record.getEntryId() + "/${i}"
+                attachmentValue["Name"] = attachment.getName()
+                recordValue = attachmentValue
+            }
+            else
+                recordValue = record.get(i).getValue().toString().toString()
+
+            if (returnFieldNames)
+                myRecordValues[myField.name] = recordValue
+            else
+                myRecordValues[i] = recordValue
+        }
+        recordData['id'] = record.get(1).toString()
+        recordData['values'] = myRecordValues
+        return recordData;
+    }
 
     /**
      * @param context The AR System Context to work with
@@ -425,13 +429,14 @@ class RemedyService {
      * @param entryObjects The JSON Objects to update
      * @return returns a TreeMap with all entry ids and any errors
      */
-    def updateEntries(ARServerUser context, String schema, entryObject, boolean useMerge) {
+    def updateEntries(ARServerUser context, String schema, entryObject, boolean useMerge, String dateFormat) {
         int multiMatchOption = 2;
         def recordId = entryObject['id']
         def values = entryObject['values']
         def query = entryObject['query']
         int mergeOptions = entryObject['mergeOptions']?.toInteger() ?: 1028;
         log.debug("mergeOp: "+ mergeOptions)
+        def formFields = getFields(context, schema)
 
         def returnValue = [:]
         if (entryObject['multiMatchOption'] != null) {
@@ -483,14 +488,17 @@ class RemedyService {
             myEntry = UtilService.setEntry(myEntry, values, fieldCache)
             try {
                 def entryResult = updateEntryInternal(context, schema, myEntry, myRecordId, mergeOptions, useMerge)
+                log.error('done ' + entryResult);
                 def myResult = [:];
                 myResult['message'] = 'success';
-                myResult['entry'] = myEntry
+                log.error('done ' + myResult);
+                myResult['entry'] = convertRecord(myEntry, formFields, dateFormat, true, true);
+                log.error('done2 ' + myResult);
                 updateResults.push(myResult)
             } catch (error) {
                 def myResult = [:];
                 myResult['message'] = 'error';
-                myResult['entry'] = myEntry
+                myResult['entry'] = convertRecord(myEntry, formFields, dateFormat, true, true);
                 myResult['details'] = error
                 updateResults.push(myResult)
             }

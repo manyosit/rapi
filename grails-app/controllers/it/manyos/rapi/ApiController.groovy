@@ -163,6 +163,7 @@ class ApiController {
         log.debug("Params: " + params)
         def format = "JSON"
         def impersonateUser = null
+        def dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
         ARServerUser context = new ARServerUser();
         try {
             if (params.impersonateUser ) {
@@ -176,19 +177,27 @@ class ApiController {
             //checke form
             if (params.form == null || params.form.equals(""))
                 render "Please provide a form"
+            if (params.dateFormat)
+                dateFormat=params.dateFormat;
             if (params.format && params.format.equalsIgnoreCase("XML")) {
                 format = "XML"
                 //create Entries
                 /*request.XML.entry.entry.Strasse__c.each {
                     log.debug it
                 }*/
-                returnValue = remedyService.updateEntries(context, params.form, request.XML, false)
+                returnValue = remedyService.updateEntries(context, params.form, request.XML, false, dateFormat)
                 if (returnValue && returnValue.size() == 1) {
                     returnValue = returnValue[0]
                 }
                 render(status: 200, text: returnValue) as XML
+            } else if (params.format && params.format.equalsIgnoreCase("JSONOBJECT")) {
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, false, dateFormat)
+                if (returnValue && returnValue.size() == 1) {
+                    returnValue = returnValue[0]
+                }
+                render returnValue as JSON
             } else {
-                returnValue = remedyService.updateEntries(context, params.form, request.JSON, false)
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, false, dateFormat)
                 if (returnValue && returnValue.size() == 1) {
                     returnValue = returnValue[0]
                 }
@@ -211,6 +220,7 @@ class ApiController {
     def patch() {
         log.debug("Params: " + params)
         def format = "JSON"
+        def dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
         def impersonateUser = null
         def mergeOptions = 4
         ARServerUser context = new ARServerUser();
@@ -226,6 +236,8 @@ class ApiController {
             //checke form
             if (params.form == null || params.form.equals(""))
                 render "Please provide a form"
+            if (params.dateFormat)
+                dateFormat=params.dateFormat;
             if (params.mergeOptions != null)
                 mergeOptions = params.mergeOptions?.toInteger() ?: 4;
             if (params.format && params.format.equalsIgnoreCase("XML")) {
@@ -234,18 +246,24 @@ class ApiController {
                 /*request.XML.entry.entry.Strasse__c.each {
                     log.debug it
                 }*/
-                returnValue = remedyService.updateEntries(context, params.form, request.XML, true)
+                returnValue = remedyService.updateEntries(context, params.form, request.XML, true, dateFormat)
                 if (returnValue && returnValue.size() == 1) {
                     returnValue = returnValue[0]
                 }
                 render(status: 200, text: returnValue) as XML
-            } else {
-                returnValue = remedyService.updateEntries(context, params.form, request.JSON, true)
+            } else if (params.format && params.format.equalsIgnoreCase("JSONOBJECT")) {
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, false, dateFormat)
                 if (returnValue && returnValue.size() == 1) {
                     returnValue = returnValue[0]
                 }
-                render(status: 200, text: returnValue) as JSON
-                //render returnValue as JSON
+                render returnValue as JSON
+            } else {
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, true, dateFormat)
+                if (returnValue && returnValue.size() == 1) {
+                    returnValue = returnValue[0]
+                }
+                //render(status: 200, text: returnValue) as JSON
+                render returnValue as JSON
             }
         } catch (Exception e) {
             if (params.format && params.format.equalsIgnoreCase("XML")) {
