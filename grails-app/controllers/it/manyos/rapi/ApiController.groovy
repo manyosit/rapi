@@ -26,6 +26,7 @@ class ApiController {
         def countOnly = false
         def showServerConfig = false
         def showServerStatistics = false
+        def formDetails = false
         def showDisplayOnlyFields = false
         def sortString = null
         def cacheResults = false
@@ -63,6 +64,8 @@ class ApiController {
                 dateFormat=params.dateFormat;
             if (params.cacheResults && params.cacheResults.equalsIgnoreCase("true"))
                 cacheResults=true
+            if (params.formDetails && params.formDetails.equalsIgnoreCase("true"))
+                formDetails=true
             if (params.cacheTime)
                 cacheTime=params.cacheTime
             if (params.sort)
@@ -77,7 +80,7 @@ class ApiController {
                 else if (showServerStatistics)
                     returnValue['statistics'] = remedyService.getServerStatistics(context)
                 else
-                    returnValue['forms'] = remedyService.getForms(context)
+                    returnValue['forms'] = remedyService.getForms(context, formDetails)
                 if (format == "XML")
                     render returnValue as XML
                 else

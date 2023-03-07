@@ -381,9 +381,56 @@ class RemedyService {
      * @param context The AR Server Context to use
      * @return a list of all forms on the server
      */
-    def getForms(ARServerUser context) {
-        def forms = context.getListForm()
-        Collections.sort(forms);
+    def getForms(ARServerUser context, boolean details) {
+        def forms
+        if (!details) {
+            forms = context.getListForm()
+            Collections.sort(forms);
+        } else {
+            def formCriteria = new FormCriteria();
+            //formCriteria.setPropertiesToRetrieve(FormCriteria.DEFAULT_VUI | FormCriteria.SCHEMA_TYPE)
+            formCriteria.setRetrieveAll(true)
+            def formDetails = context.getListFormObjects(0,
+                    Constants.AR_LIST_SCHEMA_ALL | Constants.AR_HIDDEN_INCREMENT,
+                    null,
+                    null,
+                    formCriteria);
+            forms = new ArrayList()
+            //log.error("hui" + formDetails)
+            formDetails.each {
+                def form = new HashMap();
+                form['name'] = it.getName()
+                def formType = it.getFormType()
+                if (formType == 1) {
+                    form['formType'] = "Base Form"
+                } else if (formType == 2) {
+                    form['formType'] = "Join Form"
+                } else if (formType == 3) {
+                    form['formType'] = "View Form"
+                } else if (formType == 4) {
+                    form['formType'] = "Display-only Form"
+                } else if (formType == 5) {
+                    form['formType'] = "Vendor Form"
+                } else {
+                    form['formType'] = "Unknown Form Type: " + formType
+                }
+                form['defaultVUI'] = it.getDefaultVUI()
+                form['class'] = it.getClass()
+                form['lastChangedBy'] = it.getLastChangedBy()
+                form['lastUpdateTime'] = it.getLastUpdateTime()?.value
+                form['sortInfo'] = it.sortInfo
+                if (it.getClass() == com.bmc.arsys.api.JoinForm) {
+                    def joinInfo = new HashMap()
+                    def joinForm = (com.bmc.arsys.api.JoinForm) it;
+                    joinInfo['memberA'] = joinForm.getMemberA();
+                    joinInfo['memberB'] = joinForm.getMemberB();
+                    joinInfo['joinQualification'] = joinForm.getJoinQualification().toString();
+                    joinInfo['joinOption'] = joinForm.getJoinOption();
+                    form['joinInfo'] = joinInfo;
+                }
+                forms.add(form)
+            }
+        }
         return forms
     }
 
