@@ -9,6 +9,10 @@ class UrlMappings {
             }
         }*/
 
+        "/search"(controller:"api") {
+            action = [POST: "get"]
+        }
+
         "/$server/$form?/$query**?"(controller:"api") {
             action = [GET: "get", PUT: "put", DELETE: "delete", POST: "post", PATCH: "patch"]
         }

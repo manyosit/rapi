@@ -33,14 +33,38 @@ class ApiController {
         def cacheTime = 600000
         def impersonateUser = null
         def dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
+        def query = params.query;
+        def form = params.form;
+
+        def server = params.server;
+        def port = params.port?.toInteger() ?: 0;
+
+        //handle post data
+        if (request && request.JSON && request.JSON.size() > 0) {
+            log.debug("Get data from body", request.JSON);
+            def postData = request.JSON;
+            if (postData.server) {
+                server = postData.server;
+            }
+            if (postData.query) {
+                query = postData.query;
+            }
+            if (postData.form) {
+                form = postData.form;
+            }
+            if (postData.port) {
+                port = postData.port?.toInteger() ?: 0;
+            }
+        }
+
         ArrayList fields = null;
         ARServerUser context = new ARServerUser();
         try {
             if (params.impersonateUser ) {
                 impersonateUser = params.impersonateUser
-                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0, impersonateUser)
+                context = remedyService.getARContext(server, port, impersonateUser)
             } else {
-                context = remedyService.getARContext(params.server, params.port?.toInteger() ?: 0)
+                context = remedyService.getARContext(server, port)
             }
             remedyService.setRpcQueue(context, params)
             //context = remedyService.getARContext("server", 0.intValue(), "a", "v")
@@ -74,7 +98,7 @@ class ApiController {
                 fields=params.fields.tokenize( ',' );
 
             //Return Formlist if no query given
-            if (params.form == null || params.form == '') {
+            if (form == null || form == '') {
                 if (showServerConfig)
                     returnValue['config'] = remedyService.getServerConfig(context)
                 else if (showServerStatistics)
@@ -87,9 +111,9 @@ class ApiController {
                     render returnValue as JSON
             }
             //Return Fielddef if no query given
-            else if (params.query == null || params.query == '') {
-                returnValue['fields'] = remedyService.getFields(context, params.form)
-                returnValue['form'] = params.form
+            else if (query == null || query == '') {
+                returnValue['fields'] = remedyService.getFields(context, form)
+                returnValue['form'] = form
                 if (format == "XML")
                     render returnValue as XML
                 else
@@ -98,8 +122,8 @@ class ApiController {
             //Return only size
             else if (countOnly == true) {
                 def resultSize = remedyService.countRecords(context,
-                        params.form,
-                        params.query)
+                        form,
+                        query)
                 if (format == "XML")
                     render resultSize as XML
                 else
@@ -107,8 +131,8 @@ class ApiController {
             } else {
                 //Return records
                 def records = remedyService.queryForm(context,
-                        params.form,
-                        params.query,
+                        form,
+                        query,
                         returnFieldNames,
                         translateSelectionFields,
                         params.firstEntry?.toInteger() ?:0,
@@ -121,9 +145,9 @@ class ApiController {
                         sortString);
 
                 returnValue['status'] = 'success'
-                returnValue['query'] = params.query
-                returnValue['server'] = params.server + ":" + params.port?.toInteger() ?: 0
-                returnValue['form'] = params.form
+                returnValue['query'] = query
+                returnValue['server'] = server + ":" + port?.toInteger() ?: 0
+                returnValue['form'] = form
                 returnValue['runtime'] = new Date().getTime() - startDate.getTime()
                 returnValue['dataSize'] = records.size()
                 returnValue['data'] = records
