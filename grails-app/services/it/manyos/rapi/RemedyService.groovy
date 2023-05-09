@@ -289,6 +289,8 @@ class RemedyService {
             if (record.get(i).getValue() == null)
                 recordValue = null
             else if (myField.getType().equals("SelectionField")) {
+                //log.error "Error " + record.get(i).getValue().toString();
+                //log.error "Error " + record.get(i).getValue();
                 if (translateSelectionFields)
                     recordValue = myField.valueMapping[Integer.parseInt(record.get(i).getValue().toString().toString())]
                 else
@@ -309,8 +311,6 @@ class RemedyService {
                 }
                 recordValue = diaryValues
             } else if (record.get(i).getValue() != null && myField.getFieldId() == 15) {
-                //log.debug formFields.get(7).valueMapping.values()
-                //log.debug formFields.get(7).valueMapping.keySet()
                 if (translateSelectionFields)
                     recordValue = UtilService.convertStatusHistoryValue(record.get(i).getValue().toString(), new ArrayList(formFields.get(7).valueMapping.values()))
                 else
@@ -535,12 +535,13 @@ class RemedyService {
             myEntry = UtilService.setEntry(myEntry, values, fieldCache)
             try {
                 def entryResult = updateEntryInternal(context, schema, myEntry, myRecordId, mergeOptions, useMerge)
-                log.error('done ' + entryResult);
+                //log.error('done ' + entryResult);
                 def myResult = [:];
                 myResult['message'] = 'success';
-                log.error('done ' + myResult);
-                myResult['entry'] = convertRecord(myEntry, formFields, dateFormat, true, true);
-                log.error('done2 ' + myResult);
+                //log.error('done ' + myResult);
+                //myResult['entry'] = convertRecord(myEntry, formFields, dateFormat, true, true);
+                //Return Entry the same way it was send.
+                myResult['entry'] = myEntry;
                 updateResults.push(myResult)
             } catch (error) {
                 def myResult = [:];
