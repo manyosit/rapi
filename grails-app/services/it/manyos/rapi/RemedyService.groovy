@@ -546,11 +546,11 @@ class RemedyService {
             } catch (error) {
                 def myResult = [:];
                 myResult['message'] = 'error';
-                /*try {
-                    myResult['entry'] = convertRecord(myEntry, formFields, dateFormat, translateSelectionFields, true);
+                try {
+                    myResult['entry'] = convertRecord(myEntry, formFields, dateFormat, false, true);
                 } catch (errorConvert) {
                     log.error("Cannot convert record " + errorConvert)
-                }*/
+                }
                 myResult['entry'] = myEntry;
                 myResult['details'] = error
                 updateResults.push(myResult)
