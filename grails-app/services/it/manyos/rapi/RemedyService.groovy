@@ -539,9 +539,9 @@ class RemedyService {
                 def myResult = [:];
                 myResult['message'] = 'success';
                 //log.error('done ' + myResult);
-                //myResult['entry'] = convertRecord(myEntry, formFields, dateFormat, true, true);
+                myResult['entry'] = convertRecord(myEntry, formFields, dateFormat, false, true);
                 //Return Entry the same way it was send.
-                myResult['entry'] = myEntry;
+                //myResult['entry'] = myEntry;
                 updateResults.push(myResult)
             } catch (error) {
                 def myResult = [:];
@@ -551,7 +551,7 @@ class RemedyService {
                 } catch (errorConvert) {
                     log.error("Cannot convert record " + errorConvert)
                 }
-                myResult['entry'] = myEntry;
+                //myResult['entry'] = myEntry;
                 myResult['details'] = error
                 updateResults.push(myResult)
             }
