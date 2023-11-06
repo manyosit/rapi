@@ -190,10 +190,7 @@ class ApiController {
         log.debug("Params: " + params)
         def format = "JSON"
         def impersonateUser = null
-        def translateSelectionFields = true;
         def dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
-        if (params.translateSelectionFields && params.translateSelectionFields.equals("false"))
-            translateSelectionFields = false
         ARServerUser context = new ARServerUser();
         try {
             if (params.impersonateUser ) {
@@ -215,19 +212,19 @@ class ApiController {
                 /*request.XML.entry.entry.Strasse__c.each {
                     log.debug it
                 }*/
-                returnValue = remedyService.updateEntries(context, params.form, request.XML, false, dateFormat, translateSelectionFields)
+                returnValue = remedyService.updateEntries(context, params.form, request.XML, false, dateFormat)
                 if (returnValue && returnValue.size() == 1) {
                     returnValue = returnValue[0]
                 }
                 render(status: 200, text: returnValue) as XML
             } else if (params.format && params.format.equalsIgnoreCase("JSONOBJECT")) {
-                returnValue = remedyService.updateEntries(context, params.form, request.JSON, false, dateFormat, translateSelectionFields)
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, false, dateFormat)
                 if (returnValue && returnValue.size() == 1) {
                     returnValue = returnValue[0]
                 }
                 render returnValue as JSON
             } else {
-                returnValue = remedyService.updateEntries(context, params.form, request.JSON, false, dateFormat, translateSelectionFields)
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, false, dateFormat)
                 if (returnValue && returnValue.size() == 1) {
                     returnValue = returnValue[0]
                 }
@@ -252,10 +249,7 @@ class ApiController {
         def format = "JSON"
         def dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
         def impersonateUser = null
-        def translateSelectionFields = true;
         def mergeOptions = 4
-        if (params.translateSelectionFields && params.translateSelectionFields.equals("false"))
-            translateSelectionFields = false
         ARServerUser context = new ARServerUser();
         try {
             if (params.impersonateUser ) {
@@ -279,19 +273,19 @@ class ApiController {
                 /*request.XML.entry.entry.Strasse__c.each {
                     log.debug it
                 }*/
-                returnValue = remedyService.updateEntries(context, params.form, request.XML, true, dateFormat, translateSelectionFields)
+                returnValue = remedyService.updateEntries(context, params.form, request.XML, true, dateFormat)
                 if (returnValue && returnValue.size() == 1) {
                     returnValue = returnValue[0]
                 }
                 render(status: 200, text: returnValue) as XML
             } else if (params.format && params.format.equalsIgnoreCase("JSONOBJECT")) {
-                returnValue = remedyService.updateEntries(context, params.form, request.JSON, false, dateFormat, translateSelectionFields)
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, false, dateFormat)
                 if (returnValue && returnValue.size() == 1) {
                     returnValue = returnValue[0]
                 }
                 render returnValue as JSON
             } else {
-                returnValue = remedyService.updateEntries(context, params.form, request.JSON, true, dateFormat, translateSelectionFields)
+                returnValue = remedyService.updateEntries(context, params.form, request.JSON, true, dateFormat)
                 if (returnValue && returnValue.size() == 1) {
                     returnValue = returnValue[0]
                 }
