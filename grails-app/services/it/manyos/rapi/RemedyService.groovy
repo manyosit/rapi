@@ -476,7 +476,7 @@ class RemedyService {
      * @param entryObjects The JSON Objects to update
      * @return returns a TreeMap with all entry ids and any errors
      */
-    def updateEntries(ARServerUser context, String schema, entryObject, boolean useMerge, String dateFormat) {
+    def updateEntries(ARServerUser context, String schema, entryObject, boolean useMerge, String dateFormat, boolean translateSelectionFields) {
         int multiMatchOption = 2;
         def recordId = entryObject['id']
         def values = entryObject['values']
@@ -547,7 +547,7 @@ class RemedyService {
                 def myResult = [:];
                 myResult['message'] = 'error';
                 try {
-                    myResult['entry'] = convertRecord(myEntry, formFields, dateFormat, true, true);
+                    myResult['entry'] = convertRecord(myEntry, formFields, dateFormat, translateSelectionFields, true);
                 } catch (errorConvert) {
                     log.error("Cannot convert record " + errorConvert)
                 }
