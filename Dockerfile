@@ -3,7 +3,7 @@ MAINTAINER Robert Hannemann
 
 ENV GRAILS_VERSION 5.2.5
 
-RUN apk add --no-cache wget unzip
+RUN apt update && apt install -y wget unzip
 
 # Install Grails
 WORKDIR /usr/lib/jvm
