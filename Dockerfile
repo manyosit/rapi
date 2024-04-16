@@ -1,4 +1,4 @@
-FROM openjdk:23-jdk-slim
+FROM ibmjava:8-sdk
 MAINTAINER Robert Hannemann
 
 ENV GRAILS_VERSION 5.2.5
