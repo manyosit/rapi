@@ -1,4 +1,4 @@
-FROM openjdk:23-jdk-slim
+FROM ibmjava:8-sdk
 MAINTAINER Robert Hannemann
 
 ENV GRAILS_VERSION 5.2.5
@@ -15,7 +15,7 @@ RUN wget https://github.com/grails/grails-core/releases/download/v$GRAILS_VERSIO
 ENV GRAILS_HOME /usr/lib/jvm/grails
 ENV PATH $GRAILS_HOME/bin:$PATH
 
-RUN addgroup -S appgroup -g 900 && adduser -S appuser -u 900 -G appgroup
+RUN addgroup appgroup -gid 900 && adduser --gecos GECOS appuser --uid=900 --gid=900 --disabled-password
 
 # Create App Directory
 RUN mkdir /app
