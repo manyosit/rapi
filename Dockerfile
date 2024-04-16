@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:23-jdk-slim
 MAINTAINER Robert Hannemann
 
 ENV GRAILS_VERSION 5.2.5
