@@ -499,13 +499,15 @@ class RemedyService {
         }
         //loadfieldlist
         def myEntries = []
-        int[] fields = [1,2]
+        int[] fields = [1]
         if (query != null) {
             QualifierInfo qual = context.parseQualification(schema, query);
             def sortInfoList = new ArrayList();
             myEntries = context.getListEntryObjects(schema, qual, 0, 0, sortInfoList, fields , false, null)
         } else {
-            def myEntry = context.getEntry(schema, recordId, fields)
+            def myEntry = context.getEntry(schema, recordId, fields);
+            //log.error ('Entry received1' + schema + ' -> ' + recordId + ' -> ' + fields);
+            //log.error ('Entry received2' + myEntry);
             myEntries.push(myEntry)
         }
 
@@ -531,7 +533,7 @@ class RemedyService {
         myEntries.each {
             def myEntry = it;
             def myRecordId = it.get(1).getValue();
-
+            log.error('Prepare Record' + myEntry);
             myEntry = UtilService.setEntry(myEntry, values, fieldCache)
             try {
                 def entryResult = updateEntryInternal(context, schema, myEntry, myRecordId, mergeOptions, useMerge)
@@ -573,6 +575,7 @@ class RemedyService {
      * @return returns a TreeMap with all entry ids and any errors
      */
     def updateEntryInternal(ARServerUser context, String schema, Entry myEntry, String recordId, mergeOptions, Boolean useMerge) {
+        //log.error('Prepare Record int' + myEntry);
         if (useMerge == true) {
             log.debug('Use merge for update.');
             context.mergeEntry(schema, myEntry, mergeOptions);
