@@ -610,6 +610,9 @@ class RemedyService {
                 e.printStackTrace()
                 log.error e.getMessage()
                 allEntries.put(it, e.getCause().toString() + " - " + e.getMessage().toString())
+                if (allEntries.size() == 1) {
+                    throw e;
+                }
             }
         }
         return allEntries

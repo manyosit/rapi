@@ -395,7 +395,12 @@ class ApiController {
             if (params.format && params.format.equalsIgnoreCase("XML")) {
                 render(status: 500, text: e.getMessage()) as XML
             } else {
-                render(status: 500, text: e.getMessage()) as JSON
+                response.status = 500;
+                if (params.format && params.format.equalsIgnoreCase("JSONOBJECT")) {
+                    render e as JSON
+                } else {
+                    render(status: 500, text: e.getMessage()) as JSON
+                }
             }
         } finally {
             context.logout()
