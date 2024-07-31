@@ -556,6 +556,10 @@ class RemedyService {
                 //myResult['entry'] = myEntry;
                 myResult['details'] = error
                 updateResults.push(myResult)
+                //reject directly if only 1 record
+                if (myEntries.size() == 1) {
+                    throw error;
+                }
             }
         }
         //Save entry

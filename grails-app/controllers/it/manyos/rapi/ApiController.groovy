@@ -218,9 +218,14 @@ class ApiController {
                 }
                 render(status: 200, text: returnValue) as XML
             } else if (params.format && params.format.equalsIgnoreCase("JSONOBJECT")) {
-                returnValue = remedyService.updateEntries(context, params.form, request.JSON, false, dateFormat)
-                if (returnValue && returnValue.size() == 1) {
-                    returnValue = returnValue[0]
+                try {
+                    returnValue = remedyService.updateEntries(context, params.form, request.JSON, false, dateFormat);
+                    if (returnValue && returnValue.size() == 1) {
+                        returnValue = returnValue[0];
+                    }
+                } catch (error) {
+                    returnValue = error;
+                    response.status = 500;
                 }
                 render returnValue as JSON
             } else {
