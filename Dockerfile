@@ -32,7 +32,8 @@ COPY --chown=appuser:appgroup . /app
 # Run Grails dependency-report command to pre-download dependencies but not
 # create unnecessary build files or artifacts.
 #RUN grails dependency-report
-RUN grails war
+#RUN grails war
+RUN gradlew assemble
 
 # Set Default Behavior
 ENTRYPOINT ["java"]
