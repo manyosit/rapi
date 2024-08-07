@@ -1,4 +1,4 @@
-FROM openjdk:24-jdk-slim-bookworm
+FROM gradle:8.9-jdk-21-and-22-alpine
 MAINTAINER Robert Hannemann
 
 ENV GRAILS_VERSION 6.2.0
@@ -11,7 +11,7 @@ RUN wget https://github.com/grails/grails-forge/releases/download/v$GRAILS_VERSI
     unzip grails-cli-$GRAILS_VERSION.zip && \
     rm -rf grails-cli-$GRAILS_VERSION.zip && \
     ln -s grails-cli-$GRAILS_VERSION grails
-# Setup Grails path.
+# Setup Grails path.java
 ENV GRAILS_HOME /usr/lib/jvm/grails
 ENV PATH $GRAILS_HOME/bin:$PATH
 
