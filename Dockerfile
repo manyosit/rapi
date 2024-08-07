@@ -1,4 +1,4 @@
-FROM ibmjava:11-jdk
+FROM openjdk:24-jdk-slim-bookworm
 MAINTAINER Robert Hannemann
 
 ENV GRAILS_VERSION 6.2.0
