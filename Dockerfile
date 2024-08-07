@@ -1,19 +1,19 @@
 FROM gradle:8.9-jdk-21-and-22-alpine
 MAINTAINER Robert Hannemann
 
-ENV GRAILS_VERSION 6.2.0
+#ENV GRAILS_VERSION 6.2.0
 
-RUN apt update && apt install -y wget unzip
+#RUN apt update && apt install -y wget unzip
 
 # Install Grails
 WORKDIR /usr/lib/jvm
-RUN wget https://github.com/grails/grails-forge/releases/download/v$GRAILS_VERSION/grails-cli-$GRAILS_VERSION.zip && \
-    unzip grails-cli-$GRAILS_VERSION.zip && \
-    rm -rf grails-cli-$GRAILS_VERSION.zip && \
-    ln -s grails-cli-$GRAILS_VERSION grails
+#RUN wget https://github.com/grails/grails-forge/releases/download/v$GRAILS_VERSION/grails-cli-$GRAILS_VERSION.zip && \
+#    unzip grails-cli-$GRAILS_VERSION.zip && \
+#    rm -rf grails-cli-$GRAILS_VERSION.zip && \
+#    ln -s grails-cli-$GRAILS_VERSION grails
 # Setup Grails path.java
-ENV GRAILS_HOME /usr/lib/jvm/grails
-ENV PATH $GRAILS_HOME/bin:$PATH
+#ENV GRAILS_HOME /usr/lib/jvm/grails
+#ENV PATH $GRAILS_HOME/bin:$PATH
 
 RUN addgroup appgroup -gid 900 && adduser --gecos GECOS appuser --uid=900 --gid=900 --disabled-password
 
