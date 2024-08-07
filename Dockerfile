@@ -1,4 +1,4 @@
-FROM ibmjava:11-sdk
+FROM ibmjava:11-jdk
 MAINTAINER Robert Hannemann
 
 ENV GRAILS_VERSION 6.2.0
