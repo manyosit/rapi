@@ -1,7 +1,7 @@
-FROM ibmjava:8-sdk
+FROM ibmjava:11-sdk
 MAINTAINER Robert Hannemann
 
-ENV GRAILS_VERSION 5.2.5
+ENV GRAILS_VERSION 6.2.0
 
 RUN apt update && apt install -y wget unzip
 
