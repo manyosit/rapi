@@ -15,7 +15,8 @@ WORKDIR /usr/lib/jvm
 #ENV GRAILS_HOME /usr/lib/jvm/grails
 #ENV PATH $GRAILS_HOME/bin:$PATH
 
-RUN addgroup appgroup -gid 900 && adduser --gecos GECOS appuser --uid=900 --gid=900 --disabled-password
+RUN addgroup appgroup -g 900
+RUN adduser --gecos GECOS appuser --uid=900 --gid=900 --disabled-password
 
 # Create App Directory
 RUN mkdir /app
@@ -33,8 +34,9 @@ COPY --chown=appuser:appgroup . /app
 # create unnecessary build files or artifacts.
 #RUN grails dependency-report
 #RUN grails war
-RUN gradlew assemble
-
+#RUN gradlew assemble
+RUN gradle clean --warning-mode=all
+RUN gradle bootWar -Dgrails.env=production
 # Set Default Behavior
 ENTRYPOINT ["java"]
 
