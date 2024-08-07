@@ -31,7 +31,7 @@ COPY --chown=appuser:appgroup . /app
 
 # Run Grails dependency-report command to pre-download dependencies but not
 # create unnecessary build files or artifacts.
-RUN grails dependency-report
+#RUN grails dependency-report
 RUN grails war
 
 # Set Default Behavior
