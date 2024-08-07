@@ -16,7 +16,7 @@ WORKDIR /usr/lib/jvm
 #ENV PATH $GRAILS_HOME/bin:$PATH
 
 RUN addgroup appgroup -g 900
-RUN adduser --gecos GECOS appuser --uid=900 --gid=900 --disabled-password
+RUN adduser -g GECOS appuser -u=900 -G=900 -D
 
 # Create App Directory
 RUN mkdir /app
