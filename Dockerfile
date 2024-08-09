@@ -26,8 +26,7 @@ RUN gradle clean && gradle assemble
 
 WORKDIR /app
 
-RUN cp /build/build/libs/rapi-22.war /app/rapi.war
-#&& rm -rf /build
+RUN cp /build/build/libs/rapi-22.war /app/rapi.war && rm -rf /build/*
 
 # Set Default Behavior
 ENTRYPOINT ["java"]
