@@ -3,8 +3,6 @@ MAINTAINER Robert Hannemann
 
 #ENV GRAILS_VERSION 6.2.0
 
-#RUN apt update && apt install -y wget unzip
-
 # Install Grails
 WORKDIR /usr/lib/jvm
 
