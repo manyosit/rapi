@@ -23,9 +23,9 @@ COPY --chown=appuser:appgroup . /build
 
 RUN gradle clean && gradle assemble
 
-WORKDIR /build
+WORKDIR /app
 
-RUN cp /build/build/libs/rapi-22.war /app/rapi.war
+RUN cp /build/build/libs/rapi-22.war /app/rapi.war && rm -rf /build
 
 # Set Default Behavior
 ENTRYPOINT ["java"]
