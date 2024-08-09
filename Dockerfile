@@ -7,13 +7,6 @@ MAINTAINER Robert Hannemann
 
 # Install Grails
 WORKDIR /usr/lib/jvm
-#RUN wget https://github.com/grails/grails-forge/releases/download/v$GRAILS_VERSION/grails-cli-$GRAILS_VERSION.zip && \
-#    unzip grails-cli-$GRAILS_VERSION.zip && \
-#    rm -rf grails-cli-$GRAILS_VERSION.zip && \
-#    ln -s grails-cli-$GRAILS_VERSION grails
-# Setup Grails path.java
-#ENV GRAILS_HOME /usr/lib/jvm/grails
-#ENV PATH $GRAILS_HOME/bin:$PATH
 
 RUN addgroup appgroup -g 900
 RUN adduser -g GECOS appuser -u 900 -G appgroup -D
@@ -25,22 +18,20 @@ RUN chown -R appuser:appgroup /app
 
 USER appuser
 # Set Workdir
-WORKDIR /app
+WORKDIR /build
 
 # Copy App files
-COPY --chown=appuser:appgroup . /app
+COPY --chown=appuser:appgroup . /build
 
-# Run Grails dependency-report command to pre-download dependencies but not
-# create unnecessary build files or artifacts.
-#RUN grails dependency-report
-#RUN grails war
-#RUN gradlew assemble
-#RUN gradle clean --warning-mode=all
-#RUN gradle bootWar -Dgrails.env=production
 RUN gradle clean && gradle assemble
+
+WORKDIR /build
+
+RUN cp /build/build/libs/rapi-22.war /app/rapi.war
+
 # Set Default Behavior
 ENTRYPOINT ["java"]
 
 EXPOSE 8080
 
-CMD ["-Dgrails.env=prod", "-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true", "-Dlog4j2.formatMsgNoLookups=true", "-jar", "build/libs/rapi-22.war"]
+CMD ["-Dgrails.env=prod", "-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true", "-Dlog4j2.formatMsgNoLookups=true", "-jar", "/app/rapi.war"]
