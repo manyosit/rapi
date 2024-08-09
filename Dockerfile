@@ -10,8 +10,8 @@ RUN addgroup appgroup -g 900
 RUN adduser -g GECOS appuser -u 900 -G appgroup -D
 
 # Create App Directory
-RUN mkdir /app
-RUN chown -R appuser:appgroup /app
+RUN mkdir /app && mkdir /build
+RUN chown -R appuser:appgroup /app && chown -R appuser:appgroup /build
 
 
 USER appuser
