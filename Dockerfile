@@ -11,15 +11,16 @@ RUN adduser -g GECOS appuser -u 900 -G appgroup -D
 
 # Create App Directory
 RUN mkdir /app && mkdir /build
-RUN chown -R appuser:appgroup /app && chown -R appuser:appgroup /build
 
-
-USER appuser
 # Set Workdir
 WORKDIR /build
 
 # Copy App files
 COPY --chown=appuser:appgroup . /build
+
+RUN chown -R appuser:appgroup /app && chown -R appuser:appgroup /build
+
+USER appuser
 
 RUN gradle clean && gradle assemble
 
