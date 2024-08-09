@@ -1,4 +1,4 @@
-FROM gradle:7.6.4-jdk-17-alpine
+FROM gradle:7.6.4-jdk17-alpine
 MAINTAINER Robert Hannemann
 
 #ENV GRAILS_VERSION 6.2.0
