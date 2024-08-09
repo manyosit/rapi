@@ -35,8 +35,8 @@ COPY --chown=appuser:appgroup . /app
 #RUN grails dependency-report
 #RUN grails war
 #RUN gradlew assemble
-RUN gradle clean --warning-mode=all
-RUN gradle bootWar -Dgrails.env=production
+#RUN gradle clean --warning-mode=all
+#RUN gradle bootWar -Dgrails.env=production
 # Set Default Behavior
 ENTRYPOINT ["java"]
 
