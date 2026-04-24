@@ -380,3 +380,4 @@ On error, the API returns HTTP 500 with an error message:
 ## Field Caching
 
 Field definitions are cached in memory for 10 minutes per server/user/form combination. This reduces round-trips to the AR System server for repeated queries against the same form.
+
