@@ -196,9 +196,9 @@ class RemedyService {
      * @param maxRows The number of rows to return. 0 = all entries
      * @return returns all records as HashMap
      */
-    def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime, String dateFormat, String sortString) {
+    /*def queryForm(ARServerUser context, String schema, String query, Boolean returnFieldNames, Boolean translateSelectionFields, int firstEntry, int maxEntries, Boolean showDisplayOnlyFields, Boolean cacheResults, int cacheTime, String dateFormat, String sortString) {
         return queryForm(context, schema, query, returnFieldNames, translateSelectionFields, firstEntry, maxEntries, showDisplayOnlyFields, cacheResults, cacheTime, dateFormat, sortString);
-    }
+    }*/
 
 
     /**

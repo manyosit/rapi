@@ -27,7 +27,7 @@ class UtilService {
 		def authHeader = WebUtils.retrieveGrailsWebRequest().getCurrentRequest().getHeader('Authorization')
 		if (authHeader) {
 			def usernamePassword = new String(authHeader.split(' ')[1].decodeBase64())
-			def password = usernamePassword.split(':')[1]
+			def password = usernamePassword.substring(usernamePassword.indexOf(':') + 1)
 			return password
 		}
 	}
