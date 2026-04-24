@@ -422,7 +422,7 @@ class ApiController {
             def myEntry = context.getEntry(params.form, params.entryId, fieldIds)
             //log.debug myEntry
             def attachmentValue = myEntry.get(Integer.parseInt(params.fieldId)).getValue()
-            //log.debug attachmentValue
+            //log.debug("" + attachmentValue)
             def fileName = attachmentValue.getName()
             //log.debug fileName
             response.setContentType("application/octet-stream") // or or image/JPEG or text/xml or whatever type the file is

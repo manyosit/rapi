@@ -3,11 +3,6 @@ grails:
     profile: web
     codegen:
         defaultPackage: it.manyos.rapi
-    gorm:
-        reactor:
-            # Whether to translate GORM events into Reactor events
-            # Disabled by default for performance reasons
-            events: false
     controllers:
         upload:
             maxFileSize: 200000000
@@ -94,19 +89,6 @@ management:
     endpoints:
         jmx:
             unique-names: true
-
----
-hibernate:
-    cache:
-        queries: false
-        use_second_level_cache: false
-        use_query_cache: false
-dataSource:
-    pooled: true
-    jmxExport: true
-    driverClassName: org.h2.Driver
-    username: sa
-    password: ''
 
 environments:
     development:

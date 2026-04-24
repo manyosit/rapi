@@ -8,7 +8,6 @@ class RemedyService {
     def resultCache = new HashMap()
     def cacheTime = 10 * 60 * 1000 //10 minutes
 
-    def sessionFactory
     def UtilService
     def DataParser
 
